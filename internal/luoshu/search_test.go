@@ -1,6 +1,9 @@
 package luoshu
 
-import "testing"
+import (
+	"context"
+	"testing"
+)
 
 func TestKeywordScore(t *testing.T) {
 	score := keywordScore("hello world hello", "hello")
@@ -90,16 +93,22 @@ func TestMergeRRF_MaxResults(t *testing.T) {
 
 func TestSearcher_KeywordSearch(t *testing.T) {
 	store := newTestStore(t)
-	store.Append(MemoryEntry{ID: "mem-1", Content: "auth system uses JWT"})
-	store.Append(MemoryEntry{ID: "mem-2", Content: "database uses PostgreSQL"})
-	store.Append(MemoryEntry{ID: "mem-3", Content: "cache uses Redis"})
+	if err := store.Append(MemoryEntry{ID: "mem-1", Content: "auth system uses JWT"}); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Append(MemoryEntry{ID: "mem-2", Content: "database uses PostgreSQL"}); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Append(MemoryEntry{ID: "mem-3", Content: "cache uses Redis"}); err != nil {
+		t.Fatal(err)
+	}
 
 	idx := newTestIndex(t)
 	cache := &EmbeddingCache{dir: t.TempDir()}
 	embedder := &NoopEmbeddingProvider{}
 
 	searcher := NewSearcher(store, idx, cache, embedder, "")
-	results, method, err := searcher.Search(nil, "auth", SearchOptions{MaxResults: 10, Mode: "keyword"})
+	results, method, err := searcher.Search(context.Background(), "auth", SearchOptions{MaxResults: 10, Mode: "keyword"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,14 +125,16 @@ func TestSearcher_KeywordSearch(t *testing.T) {
 
 func TestSearcher_AutoMode_NoEmbedder(t *testing.T) {
 	store := newTestStore(t)
-	store.Append(MemoryEntry{ID: "mem-1", Content: "test keyword search"})
+	if err := store.Append(MemoryEntry{ID: "mem-1", Content: "test keyword search"}); err != nil {
+		t.Fatal(err)
+	}
 
 	idx := newTestIndex(t)
 	cache := &EmbeddingCache{dir: t.TempDir()}
 	embedder := &NoopEmbeddingProvider{}
 
 	searcher := NewSearcher(store, idx, cache, embedder, "")
-	results, method, err := searcher.Search(nil, "keyword", SearchOptions{MaxResults: 10, Mode: "auto"})
+	results, method, err := searcher.Search(context.Background(), "keyword", SearchOptions{MaxResults: 10, Mode: "auto"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -137,15 +148,19 @@ func TestSearcher_AutoMode_NoEmbedder(t *testing.T) {
 
 func TestSearcher_ProjectFilter(t *testing.T) {
 	store := newTestStore(t)
-	store.Append(MemoryEntry{ID: "mem-1", Content: "auth project-a", Source: MemorySource{Project: "/project-a"}})
-	store.Append(MemoryEntry{ID: "mem-2", Content: "auth project-b", Source: MemorySource{Project: "/project-b"}})
+	if err := store.Append(MemoryEntry{ID: "mem-1", Content: "auth project-a", Source: MemorySource{Project: "/project-a"}}); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Append(MemoryEntry{ID: "mem-2", Content: "auth project-b", Source: MemorySource{Project: "/project-b"}}); err != nil {
+		t.Fatal(err)
+	}
 
 	idx := newTestIndex(t)
 	cache := &EmbeddingCache{dir: t.TempDir()}
 	embedder := &NoopEmbeddingProvider{}
 
 	searcher := NewSearcher(store, idx, cache, embedder, "")
-	results, _, _ := searcher.Search(nil, "auth", SearchOptions{
+	results, _, _ := searcher.Search(context.Background(), "auth", SearchOptions{
 		MaxResults:  10,
 		Mode:        "keyword",
 		ProjectPath: "/project-a",

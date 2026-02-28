@@ -81,7 +81,7 @@ func MergeAndWriteJSON(path string, incoming interface{}) error {
 
 	existing := make(map[string]interface{})
 	if data, err := os.ReadFile(path); err == nil {
-		json.Unmarshal(data, &existing)
+		_ = json.Unmarshal(data, &existing)
 	}
 
 	merged := deepMergeMap(existing, incomingMap)

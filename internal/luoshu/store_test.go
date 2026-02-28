@@ -58,8 +58,12 @@ func TestStore_Count(t *testing.T) {
 		t.Fatalf("expected 0, got %d", count)
 	}
 
-	store.Append(MemoryEntry{ID: "mem-1", Content: "test"})
-	store.Append(MemoryEntry{ID: "mem-2", Content: "test"})
+	if err := store.Append(MemoryEntry{ID: "mem-1", Content: "test"}); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Append(MemoryEntry{ID: "mem-2", Content: "test"}); err != nil {
+		t.Fatal(err)
+	}
 
 	count, err = store.Count()
 	if err != nil {
@@ -74,15 +78,19 @@ func TestStore_CorruptedLine_Skipped(t *testing.T) {
 	store := newTestStore(t)
 
 	// Write a normal record
-	store.Append(MemoryEntry{ID: "mem-1", Content: "normal record"})
+	if err := store.Append(MemoryEntry{ID: "mem-1", Content: "normal record"}); err != nil {
+		t.Fatal(err)
+	}
 
 	// Manually append a corrupted line
 	f, _ := openAppend(store.entriesPath())
-	f.WriteString("this is not json\n")
+	_, _ = f.WriteString("this is not json\n")
 	f.Close()
 
 	// Write another normal record
-	store.Append(MemoryEntry{ID: "mem-2", Content: "another normal record"})
+	if err := store.Append(MemoryEntry{ID: "mem-2", Content: "another normal record"}); err != nil {
+		t.Fatal(err)
+	}
 
 	entries, err := store.LoadAll()
 	if err != nil {
@@ -100,7 +108,9 @@ func TestStore_Tags_Preserved(t *testing.T) {
 		Content: "memory with tags",
 		Tags:    []string{"decision", "architecture"},
 	}
-	store.Append(entry)
+	if err := store.Append(entry); err != nil {
+		t.Fatal(err)
+	}
 
 	entries, _ := store.LoadAll()
 	if len(entries[0].Tags) != 2 {

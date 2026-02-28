@@ -52,7 +52,9 @@ func (s *TemplateService) ApplyTemplate(projectPath string, templateID string, o
 	}
 
 	claudeDir := filepath.Join(projectPath, ".claude")
-	os.MkdirAll(claudeDir, 0755)
+	if err := os.MkdirAll(claudeDir, 0755); err != nil {
+		return err
+	}
 
 	if tmpl.ClaudeMd != "" {
 		claudeMdPath := filepath.Join(claudeDir, "CLAUDE.md")
@@ -188,7 +190,9 @@ func (s *TemplateService) InstallTemplateRules(scope string, targetPath string, 
 
 		// settings.json is always merged, unaffected by overwrite flag
 		if tmpl.Settings != nil {
-			templatedata.MergeAndWriteJSON(filepath.Join(claudeDir, "settings.json"), tmpl.Settings)
+			if err := templatedata.MergeAndWriteJSON(filepath.Join(claudeDir, "settings.json"), tmpl.Settings); err != nil {
+				return err
+			}
 		}
 	}
 

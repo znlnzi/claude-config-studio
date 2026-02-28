@@ -41,7 +41,7 @@ func (c *EmbeddingCache) load() {
 		return
 	}
 	defer f.Close()
-	gob.NewDecoder(f).Decode(&c.cache)
+	_ = gob.NewDecoder(f).Decode(&c.cache)
 }
 
 // Get retrieves from cache

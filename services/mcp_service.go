@@ -115,7 +115,9 @@ func (s *MCPService) GetProjectMCPServers(projectPath string) ([]MCPServer, erro
 // SaveProjectMCPServers saves project-level MCP configuration
 func (s *MCPService) SaveProjectMCPServers(projectPath string, servers []MCPServer) error {
 	claudeDir := filepath.Join(projectPath, ".claude")
-	os.MkdirAll(claudeDir, 0755)
+	if err := os.MkdirAll(claudeDir, 0755); err != nil {
+		return err
+	}
 	mcpPath := filepath.Join(claudeDir, ".mcp.json")
 	return s.writeMCPFile(mcpPath, servers)
 }
@@ -321,7 +323,7 @@ type smitheryResponse struct {
 func (s *MCPService) searchSmithery(query string, inputCursor string) (MarketplaceResult, error) {
 	page := 1
 	if inputCursor != "" {
-		fmt.Sscanf(inputCursor, "%d", &page)
+		_, _ = fmt.Sscanf(inputCursor, "%d", &page)
 	}
 
 	apiURL := fmt.Sprintf("https://registry.smithery.ai/servers?pageSize=30&page=%d", page)
@@ -648,6 +650,8 @@ func (s *MCPService) writeMCPFile(path string, servers []MCPServer) error {
 	}
 
 	dir := filepath.Dir(path)
-	os.MkdirAll(dir, 0755)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
 	return os.WriteFile(path, formatted, 0644)
 }

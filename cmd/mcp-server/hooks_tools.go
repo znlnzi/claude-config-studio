@@ -193,7 +193,7 @@ func writeHooksToSettings(path string, hooksJSON string) error {
 	// Read existing settings
 	var settings map[string]json.RawMessage
 	if data, err := os.ReadFile(path); err == nil {
-		json.Unmarshal(data, &settings)
+		_ = json.Unmarshal(data, &settings)
 	}
 	if settings == nil {
 		settings = make(map[string]json.RawMessage)
@@ -208,6 +208,8 @@ func writeHooksToSettings(path string, hooksJSON string) error {
 	}
 
 	dir := filepath.Dir(path)
-	os.MkdirAll(dir, 0755)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
 	return os.WriteFile(path, append(formatted, '\n'), 0644)
 }

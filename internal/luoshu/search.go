@@ -127,7 +127,7 @@ func (s *Searcher) semanticSearch(ctx context.Context, query string, opts Search
 		}
 		queryVec = vectors[0]
 		s.cache.Set(query, s.model, queryVec)
-		s.cache.Save()
+		_ = s.cache.Save()
 	}
 
 	// Vector search

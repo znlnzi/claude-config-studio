@@ -38,8 +38,12 @@ func (m *mockEmbedder) Name() string    { return "mock" }
 
 func TestRecall_WithLLM(t *testing.T) {
 	store := newTestStore(t)
-	store.Append(MemoryEntry{ID: "mem-1", Content: "auth system uses JWT token"})
-	store.Append(MemoryEntry{ID: "mem-2", Content: "database chose PostgreSQL"})
+	if err := store.Append(MemoryEntry{ID: "mem-1", Content: "auth system uses JWT token"}); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Append(MemoryEntry{ID: "mem-2", Content: "database chose PostgreSQL"}); err != nil {
+		t.Fatal(err)
+	}
 
 	idx := newTestIndex(t)
 	cache := &EmbeddingCache{dir: t.TempDir()}
@@ -64,7 +68,9 @@ func TestRecall_WithLLM(t *testing.T) {
 
 func TestRecall_WithoutLLM(t *testing.T) {
 	store := newTestStore(t)
-	store.Append(MemoryEntry{ID: "mem-1", Content: "auth system uses JWT token"})
+	if err := store.Append(MemoryEntry{ID: "mem-1", Content: "auth system uses JWT token"}); err != nil {
+		t.Fatal(err)
+	}
 
 	idx := newTestIndex(t)
 	cache := &EmbeddingCache{dir: t.TempDir()}
@@ -111,7 +117,9 @@ func TestRecall_NoResults(t *testing.T) {
 
 func TestRecall_LLMError_FallsBack(t *testing.T) {
 	store := newTestStore(t)
-	store.Append(MemoryEntry{ID: "mem-1", Content: "auth system uses JWT token"})
+	if err := store.Append(MemoryEntry{ID: "mem-1", Content: "auth system uses JWT token"}); err != nil {
+		t.Fatal(err)
+	}
 
 	idx := newTestIndex(t)
 	cache := &EmbeddingCache{dir: t.TempDir()}
@@ -152,8 +160,7 @@ func TestBuildFallbackSummary_Truncation(t *testing.T) {
 	}
 	summary := buildFallbackSummary(results)
 	if len(summary) > 300 {
-		// content is truncated to 200 characters + ellipsis + prefix
-		// total length should be reasonable
+		t.Errorf("expected summary to be truncated, got length %d", len(summary))
 	}
 }
 

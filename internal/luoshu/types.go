@@ -54,6 +54,6 @@ type VectorMatch struct {
 func NewMemoryID() string {
 	now := time.Now()
 	b := make([]byte, 4)
-	rand.Read(b)
+	_, _ = rand.Read(b)
 	return fmt.Sprintf("mem-%s-%s", now.Format("20060102-150405"), hex.EncodeToString(b))
 }

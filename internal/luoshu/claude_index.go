@@ -104,11 +104,11 @@ func (ci *ClaudeIndex) Reconcile(ctx context.Context, scope string) (int, error)
 	// Remove old vectors for deleted/modified files
 	for _, path := range toRemove {
 		fileID := ci.fileID(path)
-		index.Remove(fileID)
+		_ = index.Remove(fileID)
 	}
 	for _, path := range toAdd {
 		fileID := ci.fileID(path)
-		index.Remove(fileID)
+		_ = index.Remove(fileID)
 	}
 
 	// Index new/modified files
@@ -146,10 +146,10 @@ func (ci *ClaudeIndex) Reconcile(ctx context.Context, scope string) (int, error)
 		}
 	}
 	manifest.LastReconciled = now
-	ci.saveManifest(indexDir, manifest)
+	_ = ci.saveManifest(indexDir, manifest)
 
 	if ci.cache != nil {
-		ci.cache.Save()
+		_ = ci.cache.Save()
 	}
 
 	return len(toAdd) + len(toRemove), nil
@@ -184,7 +184,7 @@ func (ci *ClaudeIndex) Search(ctx context.Context, query string, scope string, l
 		}
 		queryVec = vectors[0]
 		ci.cache.Set(query, ci.model, queryVec)
-		ci.cache.Save()
+		_ = ci.cache.Save()
 	}
 
 	matches := index.Search(queryVec, limit*3, 0.3)
@@ -267,10 +267,10 @@ func (ci *ClaudeIndex) Reindex(ctx context.Context, scope string) error {
 	}
 
 	manifest.LastReconciled = now
-	ci.saveManifest(indexDir, manifest)
+	_ = ci.saveManifest(indexDir, manifest)
 
 	if ci.cache != nil {
-		ci.cache.Save()
+		_ = ci.cache.Save()
 	}
 
 	// Reset cooldown
@@ -410,7 +410,7 @@ func (ci *ClaudeIndex) indexFile(ctx context.Context, index *VectorIndex, path s
 				Text:     chunk.Text,
 				Vector:   vec,
 			}
-			index.Add([]VectorEntry{entry})
+			_ = index.Add([]VectorEntry{entry})
 		}
 	}
 }

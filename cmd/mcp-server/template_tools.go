@@ -96,13 +96,17 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 		claudeDir = filepath.Join(projectPath, ".claude")
 	}
 
-	os.MkdirAll(claudeDir, 0755)
+	if err := os.MkdirAll(claudeDir, 0755); err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("failed to create .claude dir: %v", err)), nil
+	}
 	var installedFiles []string
 
 	// Install rules file (tpl-{id}.md)
 	if tmpl.ClaudeMd != "" {
 		rulesDir := filepath.Join(claudeDir, "rules")
-		os.MkdirAll(rulesDir, 0755)
+		if err := os.MkdirAll(rulesDir, 0755); err != nil {
+			return mcp.NewToolResultError(fmt.Sprintf("failed to create rules dir: %v", err)), nil
+		}
 		header := fmt.Sprintf("<!-- template: %s | %s -->\n\n", tmpl.ID, tmpl.Name)
 		content := header + tmpl.ClaudeMd
 		filePath := filepath.Join(rulesDir, "tpl-"+tmpl.ID+".md")
@@ -155,7 +159,9 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 	// Install scripts
 	if len(tmpl.Scripts) > 0 {
 		scriptsDir := filepath.Join(claudeDir, "scripts")
-		os.MkdirAll(scriptsDir, 0755)
+		if err := os.MkdirAll(scriptsDir, 0755); err != nil {
+			return mcp.NewToolResultError(fmt.Sprintf("failed to create scripts dir: %v", err)), nil
+		}
 		for name, content := range tmpl.Scripts {
 			scriptPath := filepath.Join(scriptsDir, name)
 			if !overwrite {

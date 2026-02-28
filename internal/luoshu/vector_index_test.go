@@ -87,10 +87,12 @@ func TestVectorIndex_AddAndSearch(t *testing.T) {
 func TestVectorIndex_Search_MinScore(t *testing.T) {
 	idx := newTestIndex(t)
 
-	idx.Add([]VectorEntry{
+	if err := idx.Add([]VectorEntry{
 		{MemoryID: "mem-1", Vector: []float32{1, 0}},
 		{MemoryID: "mem-2", Vector: []float32{0, 1}},
-	})
+	}); err != nil {
+		t.Fatal(err)
+	}
 
 	matches := idx.Search([]float32{1, 0}, 10, 0.9)
 	if len(matches) != 1 {
@@ -100,17 +102,21 @@ func TestVectorIndex_Search_MinScore(t *testing.T) {
 
 func TestVectorIndex_Remove(t *testing.T) {
 	idx := newTestIndex(t)
-	idx.Add([]VectorEntry{
+	if err := idx.Add([]VectorEntry{
 		{MemoryID: "mem-1", ChunkID: 0, Vector: []float32{1, 0}},
 		{MemoryID: "mem-1", ChunkID: 1, Vector: []float32{0.9, 0.1}},
 		{MemoryID: "mem-2", ChunkID: 0, Vector: []float32{0, 1}},
-	})
+	}); err != nil {
+		t.Fatal(err)
+	}
 
 	if idx.Count() != 3 {
 		t.Fatalf("expected 3, got %d", idx.Count())
 	}
 
-	idx.Remove("mem-1")
+	if err := idx.Remove("mem-1"); err != nil {
+		t.Fatal(err)
+	}
 	if idx.Count() != 1 {
 		t.Fatalf("expected 1 after remove, got %d", idx.Count())
 	}
@@ -121,9 +127,11 @@ func TestVectorIndex_Persistence(t *testing.T) {
 
 	// Write
 	idx1 := &VectorIndex{dir: dir}
-	idx1.Add([]VectorEntry{
+	if err := idx1.Add([]VectorEntry{
 		{MemoryID: "mem-1", Vector: []float32{1, 2, 3}},
-	})
+	}); err != nil {
+		t.Fatal(err)
+	}
 
 	// Reload
 	idx2 := &VectorIndex{dir: dir}

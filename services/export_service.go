@@ -66,7 +66,7 @@ func (s *ExportService) ExportGlobalConfig() (string, error) {
 		filePath := filepath.Join(claudeHome, name)
 		if data, err := os.ReadFile(filePath); err == nil {
 			f, _ := w.Create(name)
-			f.Write(data)
+			_, _ = f.Write(data)
 		}
 	}
 
@@ -84,7 +84,7 @@ func (s *ExportService) ExportGlobalConfig() (string, error) {
 			filePath := filepath.Join(dirPath, entry.Name())
 			if data, err := os.ReadFile(filePath); err == nil {
 				f, _ := w.Create(filepath.Join(dir, entry.Name()))
-				f.Write(data)
+				_, _ = f.Write(data)
 			}
 		}
 	}
@@ -120,18 +120,18 @@ func (s *ExportService) ExportProjectConfig(projectPath string) (string, error) 
 	// Export root directory CLAUDE.md
 	if data, err := os.ReadFile(filepath.Join(projectPath, "CLAUDE.md")); err == nil {
 		f, _ := w.Create("CLAUDE.md")
-		f.Write(data)
+		_, _ = f.Write(data)
 	}
 
 	// Recursively export .claude directory
-	filepath.Walk(claudeDir, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(claudeDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil || info.IsDir() {
 			return nil
 		}
 		relPath, _ := filepath.Rel(projectPath, path)
 		if data, readErr := os.ReadFile(path); readErr == nil {
 			f, _ := w.Create(relPath)
-			f.Write(data)
+			_, _ = f.Write(data)
 		}
 		return nil
 	})
@@ -171,7 +171,7 @@ func (s *ExportService) ImportConfig(targetPath string) (int, error) {
 
 		destPath := filepath.Join(targetPath, name)
 		destDir := filepath.Dir(destPath)
-		os.MkdirAll(destDir, 0755)
+		_ = os.MkdirAll(destDir, 0755)
 
 		src, err := f.Open()
 		if err != nil {
@@ -184,7 +184,7 @@ func (s *ExportService) ImportConfig(targetPath string) (int, error) {
 			continue
 		}
 
-		io.Copy(dst, src)
+		_, _ = io.Copy(dst, src)
 		dst.Close()
 		src.Close()
 		count++

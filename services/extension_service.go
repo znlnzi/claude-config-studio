@@ -124,7 +124,9 @@ func (s *ExtensionService) SaveExtension(extType string, scope string, fileName 
 		dir = filepath.Join(scope, ".claude", extType)
 	}
 
-	os.MkdirAll(dir, 0755)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
 	filePath := filepath.Join(dir, fileName)
 	return os.WriteFile(filePath, []byte(content), 0644)
 }

@@ -134,13 +134,13 @@ func handleLuoshuReindex(ctx context.Context, _ mcp.CallToolRequest) (*mcp.CallT
 					Text:     chunk.Text,
 					Vector:   vec,
 				}
-				index.Add([]luoshu.VectorEntry{ve})
+				_ = index.Add([]luoshu.VectorEntry{ve})
 				indexed++
 			}
 		}
 	}
 
-	cache.Save()
+	_ = cache.Save()
 
 	duration := time.Since(start).Milliseconds()
 	result := map[string]interface{}{

@@ -62,7 +62,9 @@ func (s *HooksService) GetProjectHooks(projectPath string) ([]HooksConfig, error
 // SaveProjectHooks saves project-level hooks configuration
 func (s *HooksService) SaveProjectHooks(projectPath string, hooks []HooksConfig) error {
 	claudeDir := filepath.Join(projectPath, ".claude")
-	os.MkdirAll(claudeDir, 0755)
+	if err := os.MkdirAll(claudeDir, 0755); err != nil {
+		return err
+	}
 	settingsPath := filepath.Join(claudeDir, "settings.json")
 	return s.writeHooksToSettings(settingsPath, hooks)
 }
@@ -138,7 +140,7 @@ func (s *HooksService) writeHooksToSettings(path string, hooks []HooksConfig) er
 	// Read existing settings.json
 	var settings map[string]json.RawMessage
 	if data, err := os.ReadFile(path); err == nil {
-		json.Unmarshal(data, &settings)
+		_ = json.Unmarshal(data, &settings)
 	}
 	if settings == nil {
 		settings = make(map[string]json.RawMessage)
@@ -168,6 +170,8 @@ func (s *HooksService) writeHooksToSettings(path string, hooks []HooksConfig) er
 	}
 
 	dir := filepath.Dir(path)
-	os.MkdirAll(dir, 0755)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return err
+	}
 	return os.WriteFile(path, formatted, 0644)
 }

@@ -88,7 +88,7 @@ func (s *PluginService) TogglePlugin(pluginKey string, enabled bool) error {
 	// Read existing settings
 	var settings map[string]json.RawMessage
 	if data, err := os.ReadFile(settingsPath); err == nil {
-		json.Unmarshal(data, &settings)
+		_ = json.Unmarshal(data, &settings)
 	}
 	if settings == nil {
 		settings = make(map[string]json.RawMessage)
@@ -97,7 +97,7 @@ func (s *PluginService) TogglePlugin(pluginKey string, enabled bool) error {
 	// Read enabledPlugins
 	var plugins map[string]interface{}
 	if raw, ok := settings["enabledPlugins"]; ok {
-		json.Unmarshal(raw, &plugins)
+		_ = json.Unmarshal(raw, &plugins)
 	}
 	if plugins == nil {
 		plugins = make(map[string]interface{})
@@ -162,13 +162,13 @@ func (s *PluginService) getEnabledMap() map[string]bool {
 		return map[string]bool{}
 	}
 	var settings map[string]json.RawMessage
-	json.Unmarshal(data, &settings)
+	_ = json.Unmarshal(data, &settings)
 	raw, ok := settings["enabledPlugins"]
 	if !ok {
 		return map[string]bool{}
 	}
 	var plugins map[string]interface{}
-	json.Unmarshal(raw, &plugins)
+	_ = json.Unmarshal(raw, &plugins)
 	result := make(map[string]bool)
 	for k := range plugins {
 		result[k] = true
@@ -189,7 +189,7 @@ func (s *PluginService) getPluginDescription(name string) string {
 		return ""
 	}
 	var meta map[string]interface{}
-	json.Unmarshal(data, &meta)
+	_ = json.Unmarshal(data, &meta)
 	if desc, ok := meta["description"].(string); ok {
 		return desc
 	}

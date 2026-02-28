@@ -37,10 +37,14 @@ func setupTestProject(t *testing.T) string {
 
 	memoryDir := filepath.Join(root, ".claude", "memory")
 	rulesDir := filepath.Join(root, ".claude", "rules")
-	os.MkdirAll(memoryDir, 0755)
-	os.MkdirAll(rulesDir, 0755)
+	if err := os.MkdirAll(memoryDir, 0755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(rulesDir, 0755); err != nil {
+		t.Fatal(err)
+	}
 
-	os.WriteFile(filepath.Join(memoryDir, "MEMORY.md"), []byte(`# Project Memory
+	if err := os.WriteFile(filepath.Join(memoryDir, "MEMORY.md"), []byte(`# Project Memory
 
 ## Architecture
 This project uses a microservices architecture with Go backend and React frontend.
@@ -48,9 +52,11 @@ This project uses a microservices architecture with Go backend and React fronten
 ## Key Decisions
 - Chose PostgreSQL for database
 - Using Redis for caching
-`), 0644)
+`), 0644); err != nil {
+		t.Fatal(err)
+	}
 
-	os.WriteFile(filepath.Join(rulesDir, "coding-style.md"), []byte(`# Coding Style
+	if err := os.WriteFile(filepath.Join(rulesDir, "coding-style.md"), []byte(`# Coding Style
 
 ## Naming
 - Use camelCase for variables
@@ -60,9 +66,11 @@ This project uses a microservices architecture with Go backend and React fronten
 ## Error Handling
 - Always handle errors explicitly
 - Never silently swallow errors
-`), 0644)
+`), 0644); err != nil {
+		t.Fatal(err)
+	}
 
-	os.WriteFile(filepath.Join(rulesDir, "security.md"), []byte(`# Security Rules
+	if err := os.WriteFile(filepath.Join(rulesDir, "security.md"), []byte(`# Security Rules
 
 ## API Keys
 - Never hardcode API keys
@@ -71,7 +79,9 @@ This project uses a microservices architecture with Go backend and React fronten
 ## Input Validation
 - Validate all user input
 - Use parameterized queries
-`), 0644)
+`), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	return root
 }
@@ -107,12 +117,14 @@ func TestClaudeIndex_ScanFiles_Empty(t *testing.T) {
 func TestClaudeIndex_ScanFiles_RootMemory(t *testing.T) {
 	root := setupTestProject(t)
 	// Create official auto-memory MEMORY.md at the project root
-	os.WriteFile(filepath.Join(root, "MEMORY.md"), []byte(`# Official Auto-Memory
+	if err := os.WriteFile(filepath.Join(root, "MEMORY.md"), []byte(`# Official Auto-Memory
 
 ## User Preferences
 - Prefers functional programming style
 - Uses dark theme
-`), 0644)
+`), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	ci := NewClaudeIndex(&ciMockEmbedder{}, nil, "test-model")
 	files := ci.scanFiles(root)

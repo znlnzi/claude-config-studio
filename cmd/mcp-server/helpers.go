@@ -19,18 +19,6 @@ func resolveMemoryDir(projectPath string) (string, error) {
 	return filepath.Join(projectPath, ".claude", "memory"), nil
 }
 
-// resolveClaudeDir resolves the .claude directory based on the project_path parameter
-func resolveClaudeDir(projectPath string) (string, error) {
-	if projectPath == "" || projectPath == "global" {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return "", err
-		}
-		return filepath.Join(home, ".claude"), nil
-	}
-	return filepath.Join(projectPath, ".claude"), nil
-}
-
 // isSafeFilename checks whether the filename is safe (no path traversal)
 func isSafeFilename(name string) bool {
 	if name == "" {

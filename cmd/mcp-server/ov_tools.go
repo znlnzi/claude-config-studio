@@ -65,7 +65,7 @@ func handleOvSearch(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallTool
 	ci := luoshu.NewClaudeIndex(embedder, cache, cfg.Embedding.Model)
 
 	// Auto reconcile (with cooldown mechanism)
-	ci.Reconcile(ctx, scope)
+	_, _ = ci.Reconcile(ctx, scope)
 
 	results, err := ci.Search(ctx, query, scope, limit)
 	if err != nil {

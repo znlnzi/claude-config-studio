@@ -35,7 +35,7 @@ func (v *VolcengineProvider) Dimensions() int { return v.dimensions }
 func (v *VolcengineProvider) Chat(ctx context.Context, req ChatRequest) (*ChatResponse, error) {
 	messages := make([]chatMessage, len(req.Messages))
 	for i, m := range req.Messages {
-		messages[i] = chatMessage{Role: m.Role, Content: m.Content}
+		messages[i] = chatMessage(m)
 	}
 
 	apiReq := chatCompletionRequest{

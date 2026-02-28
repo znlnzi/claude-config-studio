@@ -79,7 +79,9 @@ func handleSaveGlobalConfig(ctx context.Context, req mcp.CallToolRequest) (*mcp.
 	}
 
 	claudeHome := filepath.Join(home, ".claude")
-	os.MkdirAll(claudeHome, 0755)
+	if err := os.MkdirAll(claudeHome, 0755); err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("failed to create directory: %v", err)), nil
+	}
 
 	var targetPath string
 	switch field {
@@ -134,7 +136,9 @@ func handleSaveProjectConfig(ctx context.Context, req mcp.CallToolRequest) (*mcp
 	}
 
 	claudeDir := filepath.Join(projectPath, ".claude")
-	os.MkdirAll(claudeDir, 0755)
+	if err := os.MkdirAll(claudeDir, 0755); err != nil {
+		return mcp.NewToolResultError(fmt.Sprintf("failed to create directory: %v", err)), nil
+	}
 
 	var targetPath string
 	switch field {
