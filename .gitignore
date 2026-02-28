@@ -1,0 +1,54 @@
+# Build output
+build/bin
+frontend/dist
+npm/platforms/*/bin/
+npm/platform/*/claude-config-mcp
+mcp-server
+
+# Dependencies
+node_modules
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+*.egg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Luoshu local config (contains API keys)
+.luoshu/
+
+# Claude Code session data (private to each user)
+.claude/memory/
+.claude/tasks/
+.claude/teams/
+.claude/.setup-meta.json

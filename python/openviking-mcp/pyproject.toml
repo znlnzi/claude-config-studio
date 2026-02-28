@@ -1,0 +1,28 @@
+[project]
+name = "openviking-mcp"
+version = "0.1.0"
+description = "MCP Server for semantic search over Claude Code memory and rules via OpenViking"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "mcp>=1.0.0",
+    "openviking>=0.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+]
+
+[project.scripts]
+openviking-mcp = "openviking_mcp.__main__:main"
+ov-sync = "openviking_mcp.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/openviking_mcp"]

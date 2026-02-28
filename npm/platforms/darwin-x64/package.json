@@ -1,0 +1,22 @@
+{
+  "name": "@claude-config/darwin-x64",
+  "version": "0.7.1",
+  "description": "claude-config-mcp binary for darwin-x64",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "files": [
+    "bin/"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anthropics/claude-config-mcp.git"
+  }
+}
