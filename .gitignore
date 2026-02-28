@@ -3,7 +3,7 @@ build/bin
 frontend/dist
 npm/platforms/*/bin/
 npm/platform/*/claude-config-mcp
-mcp-server
+/mcp-server
 
 # Dependencies
 node_modules

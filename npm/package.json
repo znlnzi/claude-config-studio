@@ -30,7 +30,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zenglingzi/claude-config-studio.git"
+    "url": "git+https://github.com/znlnzi/claude-config-studio.git"
   },
   "license": "MIT",
   "engines": {

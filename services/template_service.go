@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/zenglingzi/claude-config-studio/internal/templatedata"
+	"github.com/znlnzi/claude-config-studio/internal/templatedata"
 )
 
 // TemplateService manages template operations

@@ -1,4 +1,4 @@
-module github.com/zenglingzi/claude-config-studio
+module github.com/znlnzi/claude-config-studio
 
 go 1.23.0
 

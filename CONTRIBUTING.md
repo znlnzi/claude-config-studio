@@ -14,7 +14,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 ```bash
 # Clone the repository
-git clone https://github.com/zenglingzi/claude-config-studio.git
+git clone https://github.com/znlnzi/claude-config-studio.git
 cd claude-config-studio
 
 # Build MCP server

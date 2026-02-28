@@ -4,7 +4,7 @@ import (
 	"context"
 	"embed"
 
-	"github.com/zenglingzi/claude-config-studio/services"
+	"github.com/znlnzi/claude-config-studio/services"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
