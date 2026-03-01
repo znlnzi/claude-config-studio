@@ -13,39 +13,41 @@ import (
 	"time"
 )
 
-// VolcengineProvider is the Volcengine Doubao implementation (OpenAI-compatible API)
-type VolcengineProvider struct {
-	apiKey     string
-	endpoint   string
-	llmModel   string
-	embedModel string
-	dimensions int
-	httpClient *http.Client
+// OpenAICompatProvider is an OpenAI-compatible API provider.
+// Works with OpenAI, DeepSeek, Moonshot, Zhipu, Volcengine, SiliconFlow, and any custom endpoint.
+type OpenAICompatProvider struct {
+	providerName string
+	apiKey       string
+	endpoint     string
+	llmModel     string
+	embedModel   string
+	dimensions   int
+	httpClient   *http.Client
 }
 
 // ─── Interface implementation ─────────────────────────────────────
 
 // Name returns the provider name
-func (v *VolcengineProvider) Name() string { return "volcengine" }
+func (p *OpenAICompatProvider) Name() string { return p.providerName }
 
 // Dimensions returns the vector dimensions
-func (v *VolcengineProvider) Dimensions() int { return v.dimensions }
+func (p *OpenAICompatProvider) Dimensions() int { return p.dimensions }
 
-// Chat sends a chat request to Volcengine
-func (v *VolcengineProvider) Chat(ctx context.Context, req ChatRequest) (*ChatResponse, error) {
+// Chat sends a chat request via OpenAI-compatible API
+func (p *OpenAICompatProvider) Chat(ctx context.Context, req ChatRequest) (*ChatResponse, error) {
 	messages := make([]chatMessage, len(req.Messages))
 	for i, m := range req.Messages {
 		messages[i] = chatMessage(m)
 	}
 
 	apiReq := chatCompletionRequest{
-		Model:       v.llmModel,
+		Model:       p.llmModel,
 		Messages:    messages,
 		MaxTokens:   req.MaxTokens,
 		Temperature: req.Temperature,
 	}
 
-	respBody, err := v.doRequest(ctx, "/chat/completions", apiReq)
+	respBody, err := p.doRequest(ctx, "/chat/completions", apiReq)
 	if err != nil {
 		return nil, fmt.Errorf("Chat request failed: %w", err)
 	}
@@ -71,32 +73,32 @@ func (v *VolcengineProvider) Chat(ctx context.Context, req ChatRequest) (*ChatRe
 //   - Multimodal format: /embeddings/multimodal (input is an object array, data is a single object)
 //
 // Auto-detection: uses multimodal format when embedModel contains "vision" or "multimodal"
-func (v *VolcengineProvider) Embed(ctx context.Context, texts []string) ([][]float32, error) {
+func (p *OpenAICompatProvider) Embed(ctx context.Context, texts []string) ([][]float32, error) {
 	if len(texts) == 0 {
 		return nil, nil
 	}
 
-	if v.isMultimodalEmbed() {
-		return v.embedMultimodal(ctx, texts)
+	if p.isMultimodalEmbed() {
+		return p.embedMultimodal(ctx, texts)
 	}
-	return v.embedStandard(ctx, texts)
+	return p.embedStandard(ctx, texts)
 }
 
 // isMultimodalEmbed determines whether to use the multimodal embedding API
-func (v *VolcengineProvider) isMultimodalEmbed() bool {
-	m := strings.ToLower(v.embedModel)
+func (p *OpenAICompatProvider) isMultimodalEmbed() bool {
+	m := strings.ToLower(p.embedModel)
 	return strings.Contains(m, "vision") || strings.Contains(m, "multimodal")
 }
 
 // embedStandard performs standard OpenAI-compatible embedding
-func (v *VolcengineProvider) embedStandard(ctx context.Context, texts []string) ([][]float32, error) {
+func (p *OpenAICompatProvider) embedStandard(ctx context.Context, texts []string) ([][]float32, error) {
 	apiReq := embeddingRequest{
-		Model:          v.embedModel,
+		Model:          p.embedModel,
 		Input:          texts,
 		EncodingFormat: "float",
 	}
 
-	respBody, err := v.doRequest(ctx, "/embeddings", apiReq)
+	respBody, err := p.doRequest(ctx, "/embeddings", apiReq)
 	if err != nil {
 		return nil, fmt.Errorf("Embedding request failed: %w", err)
 	}
@@ -115,16 +117,16 @@ func (v *VolcengineProvider) embedStandard(ctx context.Context, texts []string) 
 }
 
 // embedMultimodal performs multimodal embedding (one request per text, each returning one vector)
-func (v *VolcengineProvider) embedMultimodal(ctx context.Context, texts []string) ([][]float32, error) {
+func (p *OpenAICompatProvider) embedMultimodal(ctx context.Context, texts []string) ([][]float32, error) {
 	vectors := make([][]float32, len(texts))
 
 	for i, text := range texts {
 		apiReq := multimodalEmbeddingRequest{
-			Model: v.embedModel,
+			Model: p.embedModel,
 			Input: []multimodalInput{{Type: "text", Text: text}},
 		}
 
-		respBody, err := v.doRequest(ctx, "/embeddings/multimodal", apiReq)
+		respBody, err := p.doRequest(ctx, "/embeddings/multimodal", apiReq)
 		if err != nil {
 			return nil, fmt.Errorf("Embedding[%d] request failed: %w", i, err)
 		}
@@ -143,16 +145,16 @@ func (v *VolcengineProvider) embedMultimodal(ctx context.Context, texts []string
 // ─── HTTP request layer ──────────────────────────────────
 
 // doRequest sends an HTTP request with automatic retry on 5xx (2s backoff)
-func (v *VolcengineProvider) doRequest(ctx context.Context, path string, payload any) ([]byte, error) {
+func (p *OpenAICompatProvider) doRequest(ctx context.Context, path string, payload any) ([]byte, error) {
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return nil, fmt.Errorf("failed to serialize request: %w", err)
 	}
 
-	url := strings.TrimRight(v.endpoint, "/") + path
+	url := strings.TrimRight(p.endpoint, "/") + path
 
 	// First attempt
-	respBody, statusCode, err := v.sendHTTP(ctx, url, body)
+	respBody, statusCode, err := p.sendHTTP(ctx, url, body)
 	if err != nil {
 		return nil, classifyNetError(err)
 	}
@@ -160,7 +162,7 @@ func (v *VolcengineProvider) doRequest(ctx context.Context, path string, payload
 	// Retry once on 5xx
 	if statusCode >= 500 {
 		time.Sleep(2 * time.Second)
-		respBody, statusCode, err = v.sendHTTP(ctx, url, body)
+		respBody, statusCode, err = p.sendHTTP(ctx, url, body)
 		if err != nil {
 			return nil, classifyNetError(err)
 		}
@@ -170,15 +172,15 @@ func (v *VolcengineProvider) doRequest(ctx context.Context, path string, payload
 }
 
 // sendHTTP sends a single HTTP POST request
-func (v *VolcengineProvider) sendHTTP(ctx context.Context, url string, body []byte) ([]byte, int, error) {
+func (p *OpenAICompatProvider) sendHTTP(ctx context.Context, url string, body []byte) ([]byte, int, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
 	if err != nil {
 		return nil, 0, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+v.apiKey)
+	req.Header.Set("Authorization", "Bearer "+p.apiKey)
 
-	resp, err := v.httpClient.Do(req)
+	resp, err := p.httpClient.Do(req)
 	if err != nil {
 		return nil, 0, err
 	}

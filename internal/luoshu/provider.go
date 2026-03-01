@@ -55,25 +55,36 @@ func NewProviders(cfg *Config) (LLMProvider, EmbeddingProvider) {
 
 	client := &http.Client{Timeout: 30 * time.Second}
 
+	llmProviderName := cfg.LLM.Provider
+	if llmProviderName == "" {
+		llmProviderName = "volcengine"
+	}
+	embedProviderName := cfg.Embedding.Provider
+	if embedProviderName == "" {
+		embedProviderName = llmProviderName
+	}
+
 	if cfg.LLM.APIKey != "" {
-		llm = &VolcengineProvider{
-			apiKey:     cfg.LLM.APIKey,
-			endpoint:   cfg.LLM.Endpoint,
-			llmModel:   cfg.LLM.Model,
-			embedModel: cfg.Embedding.Model,
-			dimensions: cfg.Embedding.Dimensions,
-			httpClient: client,
+		llm = &OpenAICompatProvider{
+			providerName: llmProviderName,
+			apiKey:       cfg.LLM.APIKey,
+			endpoint:     cfg.LLM.Endpoint,
+			llmModel:     cfg.LLM.Model,
+			embedModel:   cfg.Embedding.Model,
+			dimensions:   cfg.Embedding.Dimensions,
+			httpClient:   client,
 		}
 	}
 
 	if cfg.Embedding.APIKey != "" {
-		embed = &VolcengineProvider{
-			apiKey:     cfg.Embedding.APIKey,
-			endpoint:   cfg.Embedding.Endpoint,
-			llmModel:   cfg.LLM.Model,
-			embedModel: cfg.Embedding.Model,
-			dimensions: cfg.Embedding.Dimensions,
-			httpClient: client,
+		embed = &OpenAICompatProvider{
+			providerName: embedProviderName,
+			apiKey:       cfg.Embedding.APIKey,
+			endpoint:     cfg.Embedding.Endpoint,
+			llmModel:     cfg.LLM.Model,
+			embedModel:   cfg.Embedding.Model,
+			dimensions:   cfg.Embedding.Dimensions,
+			httpClient:   client,
 		}
 	}
 

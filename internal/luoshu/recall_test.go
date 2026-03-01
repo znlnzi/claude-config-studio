@@ -139,18 +139,81 @@ func TestRecall_LLMError_FallsBack(t *testing.T) {
 	}
 }
 
-func TestBuildFallbackSummary(t *testing.T) {
-	results := []SearchResult{
+func TestRecall_WithFileIndex_NilSafe(t *testing.T) {
+	store := newTestStore(t)
+	if err := store.Append(MemoryEntry{ID: "mem-1", Content: "auth system uses JWT token"}); err != nil {
+		t.Fatal(err)
+	}
+
+	idx := newTestIndex(t)
+	cache := &EmbeddingCache{dir: t.TempDir()}
+	embedder := &NoopEmbeddingProvider{}
+	llm := &NoopLLMProvider{}
+
+	searcher := NewSearcher(store, idx, cache, embedder, "")
+	recaller := NewRecaller(searcher, llm)
+	// fileIndex is nil — should not panic
+	result, err := recaller.Recall(context.Background(), "auth", SearchOptions{MaxResults: 5, Mode: "keyword"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if result.FileSources != nil {
+		t.Errorf("expected nil FileSources when fileIndex is nil, got %v", result.FileSources)
+	}
+}
+
+func TestRecall_WithFileIndex_Attached(t *testing.T) {
+	store := newTestStore(t)
+	if err := store.Append(MemoryEntry{ID: "mem-1", Content: "auth system uses JWT token"}); err != nil {
+		t.Fatal(err)
+	}
+
+	idx := newTestIndex(t)
+	cache := &EmbeddingCache{dir: t.TempDir()}
+	embedder := &NoopEmbeddingProvider{}
+	llm := &NoopLLMProvider{}
+
+	searcher := NewSearcher(store, idx, cache, embedder, "")
+
+	// Create a ClaudeIndex with noop embedder (won't actually search but exercises the code path)
+	fileIdx := NewClaudeIndex(embedder, cache, "")
+
+	recaller := NewRecaller(searcher, llm).WithFileIndex(fileIdx)
+	result, err := recaller.Recall(context.Background(), "auth", SearchOptions{MaxResults: 5, Mode: "keyword"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Noop embedder means file search returns empty (error), but JSONL search should still work
+	if result.SourceCount < 1 {
+		t.Errorf("expected at least 1 source from JSONL, got %d", result.SourceCount)
+	}
+}
+
+func TestBuildUnifiedFallbackSummary(t *testing.T) {
+	memResults := []SearchResult{
 		{Entry: MemoryEntry{Content: "first memory"}},
 		{Entry: MemoryEntry{Content: "second memory"}},
 	}
-	summary := buildFallbackSummary(results)
+	summary := buildUnifiedFallbackSummary(memResults, nil)
 	if summary == "" {
 		t.Fatal("expected non-empty summary")
 	}
 }
 
-func TestBuildFallbackSummary_Truncation(t *testing.T) {
+func TestBuildUnifiedFallbackSummary_WithFiles(t *testing.T) {
+	memResults := []SearchResult{
+		{Entry: MemoryEntry{Content: "memory entry"}},
+	}
+	fileResults := []FileSearchResult{
+		{FilePath: "/test/MEMORY.md", Context: "some context", Content: "file content"},
+	}
+	summary := buildUnifiedFallbackSummary(memResults, fileResults)
+	if summary == "" {
+		t.Fatal("expected non-empty summary")
+	}
+}
+
+func TestBuildUnifiedFallbackSummary_Truncation(t *testing.T) {
 	longContent := ""
 	for i := 0; i < 50; i++ {
 		longContent += "This is a long content string used for testing truncation"
@@ -158,17 +221,30 @@ func TestBuildFallbackSummary_Truncation(t *testing.T) {
 	results := []SearchResult{
 		{Entry: MemoryEntry{Content: longContent}},
 	}
-	summary := buildFallbackSummary(results)
+	summary := buildUnifiedFallbackSummary(results, nil)
 	if len(summary) > 300 {
 		t.Errorf("expected summary to be truncated, got length %d", len(summary))
 	}
 }
 
-func TestBuildRecallPrompt(t *testing.T) {
-	results := []SearchResult{
+func TestBuildUnifiedRecallPrompt(t *testing.T) {
+	memResults := []SearchResult{
 		{Entry: MemoryEntry{Content: "JWT authentication", Tags: []string{"decision"}}},
 	}
-	prompt := buildRecallPrompt("authentication approach", results)
+	prompt := buildUnifiedRecallPrompt("authentication approach", memResults, nil)
+	if prompt == "" {
+		t.Fatal("expected non-empty prompt")
+	}
+}
+
+func TestBuildUnifiedRecallPrompt_WithFiles(t *testing.T) {
+	memResults := []SearchResult{
+		{Entry: MemoryEntry{Content: "JWT authentication"}},
+	}
+	fileResults := []FileSearchResult{
+		{FilePath: "/test/rules/auth.md", Content: "Use OAuth2 for external APIs"},
+	}
+	prompt := buildUnifiedRecallPrompt("auth approach", memResults, fileResults)
 	if prompt == "" {
 		t.Fatal("expected non-empty prompt")
 	}

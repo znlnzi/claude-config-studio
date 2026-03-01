@@ -60,6 +60,10 @@ func handleLuoshuRecall(ctx context.Context, req mcp.CallToolRequest) (*mcp.Call
 	searcher := luoshu.NewSearcher(store, index, cache, embedder, cfg.Embedding.Model)
 	recaller := luoshu.NewRecaller(searcher, llm)
 
+	// Attach file index for unified search across JSONL memories + file content
+	fileIndex := luoshu.NewClaudeIndex(embedder, cache, cfg.Embedding.Model)
+	recaller.WithFileIndex(fileIndex)
+
 	result, err := recaller.Recall(ctx, query, luoshu.SearchOptions{
 		ProjectPath: projectPath,
 		MaxResults:  maxResults,

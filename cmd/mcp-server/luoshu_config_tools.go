@@ -166,6 +166,28 @@ func applyConfigValue(cfg *luoshu.Config, key, value string) error {
 	// LLM
 	case "llm.provider":
 		cfg.LLM.Provider = value
+		// Auto-fill defaults from preset when provider is set
+		if preset := luoshu.GetPreset(value); preset != nil && preset.LLMEndpoint != "" {
+			if cfg.LLM.Endpoint == "" || cfg.LLM.Endpoint == luoshu.DefaultConfig().LLM.Endpoint {
+				cfg.LLM.Endpoint = preset.LLMEndpoint
+			}
+			if cfg.LLM.Model == "" || cfg.LLM.Model == luoshu.DefaultConfig().LLM.Model {
+				cfg.LLM.Model = preset.LLMModel
+			}
+			// Also set embedding defaults if not independently configured
+			if cfg.Embedding.Provider == "" || cfg.Embedding.Provider == cfg.LLM.Provider {
+				cfg.Embedding.Provider = value
+				if cfg.Embedding.Endpoint == "" || cfg.Embedding.Endpoint == luoshu.DefaultConfig().Embedding.Endpoint {
+					cfg.Embedding.Endpoint = preset.EmbedEndpoint
+				}
+				if cfg.Embedding.Model == "" || cfg.Embedding.Model == luoshu.DefaultConfig().Embedding.Model {
+					cfg.Embedding.Model = preset.EmbedModel
+				}
+				if preset.EmbedDimension > 0 && cfg.Embedding.Dimensions == luoshu.DefaultConfig().Embedding.Dimensions {
+					cfg.Embedding.Dimensions = preset.EmbedDimension
+				}
+			}
+		}
 	case "llm.api_key":
 		if _, err := luoshu.PreValidateKey(value); err != nil {
 			return fmt.Errorf("API Key pre-validation failed: %v", err)

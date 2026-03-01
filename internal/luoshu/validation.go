@@ -26,6 +26,9 @@ func PreValidateKey(key string) (string, error) {
 		return "aws", nil
 	case strings.HasPrefix(key, "ghp_"):
 		return "github", nil
+	case strings.HasPrefix(key, "sk-"):
+		// Generic sk- prefix: used by DeepSeek, Moonshot, SiliconFlow, and other OpenAI-compatible providers
+		return "openai-compatible", nil
 	}
 
 	return "unknown", nil

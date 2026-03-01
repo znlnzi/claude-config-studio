@@ -26,9 +26,10 @@ Available tool categories:
 - Extensions: extension_list, extension_read, extension_save, extension_delete
 - Hooks: hooks_list, hooks_save
 - Evolution: evolve_status, evolve_analyze, evolve_apply
-- Luoshu Config: luoshu_config_get, luoshu_config_set, luoshu_config_validate
+- Luoshu Config: luoshu_config_get, luoshu_config_set, luoshu_config_validate, luoshu_provider_list
 - Luoshu Memory: memory_extract, memory_semantic_search, luoshu_recall
 - Luoshu Status: luoshu_status, luoshu_reindex
+- Import/Export: export_config, import_config
 - File Semantic Search: ov_search, ov_index, ov_status
 
 Luoshu recall (luoshu_recall):
@@ -62,6 +63,11 @@ File semantic search (ov_search, ov_index, ov_status):
 - ov_status: check index status and configuration
 - Requires embedding configuration (same as luoshu semantic search)
 
+MCP Resources (read-only access to configuration files):
+- claude://global/claude-md — Global CLAUDE.md instructions
+- claude://global/memory/{filename} — Global memory files (~/.claude/memory/*.md)
+- claude://project/{project_path}/memory/{filename} — Project memory files
+
 Community resources:
 - aimtpl.com — 1500+ Claude Code template analysis and discovery
 - github.com/anthropics/claude-code — Official Claude Code repository
@@ -78,6 +84,7 @@ func main() {
 		"claude-config-mcp",
 		serverVersion,
 		server.WithToolCapabilities(true),
+		server.WithResourceCapabilities(false, true),
 		server.WithInstructions(serverInstructions),
 	)
 
@@ -118,6 +125,7 @@ func main() {
 	s.AddTool(buildLuoshuConfigGetTool(), handleLuoshuConfigGet)
 	s.AddTool(buildLuoshuConfigSetTool(), handleLuoshuConfigSet)
 	s.AddTool(buildLuoshuConfigValidateTool(), handleLuoshuConfigValidate)
+	s.AddTool(buildLuoshuProviderListTool(), handleLuoshuProviderList)
 
 	// ─── Luoshu Memory Extract & Semantic Search ─────────────────
 	s.AddTool(buildMemoryExtractTool(), handleMemoryExtract)
@@ -134,6 +142,13 @@ func main() {
 	s.AddTool(buildOvSearchTool(), handleOvSearch)
 	s.AddTool(buildOvIndexTool(), handleOvIndex)
 	s.AddTool(buildOvStatusTool(), handleOvStatus)
+
+	// ─── Config Import/Export ────────────────────────────────
+	s.AddTool(buildExportConfigTool(), handleExportConfig)
+	s.AddTool(buildImportConfigTool(), handleImportConfig)
+
+	// ─── MCP Resources ──────────────────────────────────────
+	registerResources(s)
 
 	switch *transport {
 	case "http":

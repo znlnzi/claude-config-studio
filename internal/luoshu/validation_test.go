@@ -49,6 +49,16 @@ func TestPreValidateKey_GitHub(t *testing.T) {
 	}
 }
 
+func TestPreValidateKey_GenericSK(t *testing.T) {
+	provider, err := PreValidateKey("sk-abcdefghijklmnopqrst")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if provider != "openai-compatible" {
+		t.Errorf("expected openai-compatible, got %s", provider)
+	}
+}
+
 func TestPreValidateKey_Unknown(t *testing.T) {
 	provider, err := PreValidateKey("someunknownkeyformat12345")
 	if err != nil {
