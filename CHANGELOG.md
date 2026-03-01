@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.2] - 2026-03-01
+
+### Added
+- Multi-provider support: 7 built-in presets (OpenAI, DeepSeek, Moonshot, Zhipu, SiliconFlow, Volcengine, Custom)
+- `luoshu_provider_list` tool to list all available LLM provider presets
+- Auto-fill endpoint/model defaults when setting `llm.provider`
+- MCP Resources: read-only access to CLAUDE.md and memory files via `claude://` URIs
+- Config import/export via `export_config` and `import_config` tools (base64-zip format)
+- Unified recall: `luoshu_recall` now merges JSONL memory search with file semantic search
+
+### Changed
+- Renamed `VolcengineProvider` to `OpenAICompatProvider` for generic OpenAI-compatible API support
+- Enhanced `Recaller` with optional `ClaudeIndex` integration for cross-source search
+- Added `sk-` generic prefix detection in API key validation
+
 ## [0.7.1] - 2026-03-01
 
 ### Changed

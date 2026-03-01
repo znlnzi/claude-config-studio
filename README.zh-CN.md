@@ -132,6 +132,7 @@ make install
 | `luoshu_config_get` | 获取当前洛书配置（API Key 已脱敏） |
 | `luoshu_config_set` | 设置配置字段（含 Key 格式预校验） |
 | `luoshu_config_validate` | 测试 LLM/Embedding 连接 |
+| `luoshu_provider_list` | 列出所有可用的 LLM Provider 预设 |
 
 ### 洛书记忆
 
@@ -148,6 +149,23 @@ make install
 | `luoshu_status` | 获取系统统计（记忆数、索引大小、缓存） |
 | `luoshu_reindex` | 重建向量索引 |
 
+### 导入导出
+
+| 工具 | 说明 |
+|------|------|
+| `export_config` | 将配置导出为 base64 编码的 ZIP |
+| `import_config` | 从 base64 编码的 ZIP 导入配置 |
+
+### MCP Resources
+
+通过 MCP 资源 URI 只读访问配置文件：
+
+| URI | 说明 |
+|-----|------|
+| `claude://global/claude-md` | 全局 CLAUDE.md 指令 |
+| `claude://global/memory/{filename}` | 全局记忆文件 |
+| `claude://project/{path}/memory/{filename}` | 项目记忆文件 |
+
 ## 洛书配置
 
 洛书使用本地配置文件 `~/.luoshu/config.json`。通过 `/luoshu.config` 或环境变量配置：
@@ -159,7 +177,19 @@ make install
 | `LUOSHU_EMBEDDING_API_KEY` | Embedding 服务 API Key |
 | `LUOSHU_EMBEDDING_MODEL` | Embedding 模型名称 |
 
-当前支持的 LLM 提供商：**火山引擎豆包** (Volcengine Doubao)。
+支持的 LLM 提供商（OpenAI 兼容 API）：
+
+| 提供商 | 预设名称 |
+|--------|---------|
+| OpenAI | `openai` |
+| DeepSeek（深度求索） | `deepseek` |
+| Moonshot（Kimi） | `moonshot` |
+| 智谱 (GLM) | `zhipu` |
+| 硅基流动 | `siliconflow` |
+| 火山引擎豆包 | `volcengine` |
+| 自定义 | `custom` |
+
+使用 `luoshu_provider_list` 查看所有预设，或设置 `llm.provider` 为任意预设名称 — 端点和模型默认值会自动填充。
 
 ## 传输模式
 

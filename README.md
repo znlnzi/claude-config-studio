@@ -132,6 +132,7 @@ This will:
 | `luoshu_config_get` | Get current luoshu configuration (API keys masked) |
 | `luoshu_config_set` | Set a configuration field with key pre-validation |
 | `luoshu_config_validate` | Test LLM/Embedding connection |
+| `luoshu_provider_list` | List all available LLM provider presets |
 
 ### Luoshu Memory
 
@@ -148,6 +149,23 @@ This will:
 | `luoshu_status` | Get system stats (memory count, index size, cache) |
 | `luoshu_reindex` | Rebuild vector index |
 
+### Import/Export
+
+| Tool | Description |
+|------|-------------|
+| `export_config` | Export configuration as base64-encoded ZIP |
+| `import_config` | Import configuration from base64-encoded ZIP |
+
+### MCP Resources
+
+Read-only access to configuration files via MCP resource URIs:
+
+| URI | Description |
+|-----|-------------|
+| `claude://global/claude-md` | Global CLAUDE.md instructions |
+| `claude://global/memory/{filename}` | Global memory files |
+| `claude://project/{path}/memory/{filename}` | Project memory files |
+
 ## Luoshu Configuration
 
 Luoshu uses a local config file at `~/.luoshu/config.json`. Configure via `/luoshu.config` or environment variables:
@@ -159,7 +177,19 @@ Luoshu uses a local config file at `~/.luoshu/config.json`. Configure via `/luos
 | `LUOSHU_EMBEDDING_API_KEY` | Embedding service API key |
 | `LUOSHU_EMBEDDING_MODEL` | Embedding model name |
 
-Currently supported LLM provider: **Volcengine Doubao** (火山引擎豆包).
+Supported LLM providers (OpenAI-compatible API):
+
+| Provider | Preset Name |
+|----------|------------|
+| OpenAI | `openai` |
+| DeepSeek | `deepseek` |
+| Moonshot (Kimi) | `moonshot` |
+| Zhipu (GLM) | `zhipu` |
+| SiliconFlow | `siliconflow` |
+| Volcengine Doubao | `volcengine` |
+| Custom | `custom` |
+
+Use `luoshu_provider_list` to see all presets, or set `llm.provider` to any preset name — endpoint and model defaults are auto-filled.
 
 ## Transport Modes
 
