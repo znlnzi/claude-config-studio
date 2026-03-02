@@ -12,7 +12,7 @@
 ## v0.9.0 — Developer Experience
 
 - [x] Interactive setup wizard improvements (smarter project detection via `detect_project` tool)
-- [ ] Template marketplace: community-contributed templates via GitHub
+- [x] Template marketplace: community-contributed templates via GitHub
 - [x] Better error messages with actionable fix suggestions
 - [x] `--version` flag for the binary
 

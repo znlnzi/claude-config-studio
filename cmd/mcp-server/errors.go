@@ -63,3 +63,15 @@ func errSearchFailed(err error) string {
 func errInvalidFilename(name string) string {
 	return fmt.Sprintf("invalid filename: %s. Filename must end in .md and cannot contain '..' or path separators", name)
 }
+
+func errMarketplaceFetch(err error) string {
+	return fmt.Sprintf("failed to fetch marketplace registry: %v. Check network connectivity or CLAUDE_MARKETPLACE_REGISTRY_URL", err)
+}
+
+func errMarketplaceTemplateNotFound(id string) string {
+	return fmt.Sprintf("marketplace template not found: %s. Run marketplace_search to browse available templates", id)
+}
+
+func errMarketplaceInvalidTemplate(id string, err error) string {
+	return fmt.Sprintf("invalid marketplace template %s: %v. The template may be corrupted or incompatible", id, err)
+}

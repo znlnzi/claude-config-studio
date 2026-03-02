@@ -22,6 +22,7 @@ Available tool categories:
 - Memory: save_memory, load_memory, search_memory
 - Config: config_get_global, config_save_global, config_save_project, get_project_config, list_projects
 - Templates: template_list, template_install, template_installed, template_uninstall
+- Marketplace: marketplace_search, marketplace_install, marketplace_info
 - Extensions: extension_list, extension_read, extension_save, extension_delete
 - Hooks: hooks_list, hooks_save
 - Evolution: evolve_status, evolve_analyze, evolve_apply
@@ -114,6 +115,11 @@ func main() {
 	s.AddTool(buildInstallTemplateTool(), handleInstallTemplate)
 	s.AddTool(buildUninstallTemplateTool(), handleUninstallTemplate)
 	s.AddTool(buildGetInstalledTemplatesTool(), handleGetInstalledTemplates)
+
+	// ─── Template Marketplace ────────────────────────────────
+	s.AddTool(buildMarketplaceSearchTool(), handleMarketplaceSearch)
+	s.AddTool(buildMarketplaceInstallTool(), handleMarketplaceInstall)
+	s.AddTool(buildMarketplaceInfoTool(), handleMarketplaceInfo)
 
 	// ─── Extension Management (agents/rules/skills/commands) ───
 	s.AddTool(buildListExtensionsTool(), handleListExtensions)
