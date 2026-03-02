@@ -11,6 +11,47 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
+func buildGetGlobalConfigTool() mcp.Tool {
+	return mcp.NewTool(
+		"config_get_global",
+		mcp.WithDescription("Get global Claude Code configuration overview including CLAUDE.md, settings.json, and .mcp.json contents."),
+	)
+}
+
+func buildSaveGlobalConfigTool() mcp.Tool {
+	return mcp.NewTool(
+		"config_save_global",
+		mcp.WithDescription("Save a global Claude Code configuration field. Validates JSON for settings and mcp fields."),
+		mcp.WithString("field",
+			mcp.Required(),
+			mcp.Description("Config field to save: 'claude_md', 'settings', or 'mcp'"),
+		),
+		mcp.WithString("content",
+			mcp.Required(),
+			mcp.Description("Content to write to the field"),
+		),
+	)
+}
+
+func buildSaveProjectConfigTool() mcp.Tool {
+	return mcp.NewTool(
+		"config_save_project",
+		mcp.WithDescription("Save a project-level Claude Code configuration field. Validates JSON for settings and mcp fields."),
+		mcp.WithString("project_path",
+			mcp.Required(),
+			mcp.Description("Absolute project path"),
+		),
+		mcp.WithString("field",
+			mcp.Required(),
+			mcp.Description("Config field to save: 'claude_md', 'settings', or 'mcp'"),
+		),
+		mcp.WithString("content",
+			mcp.Required(),
+			mcp.Description("Content to write to the field"),
+		),
+	)
+}
+
 // handleGetGlobalConfig returns the global configuration overview
 func handleGetGlobalConfig(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	home, err := os.UserHomeDir()

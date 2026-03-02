@@ -14,6 +14,59 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
+func buildSaveMemoryTool() mcp.Tool {
+	return mcp.NewTool(
+		"save_memory",
+		mcp.WithDescription("Save a memory entry to the project's .claude/memory/ directory. Use 'global' as project_path for global memory (~/.claude/memory/)."),
+		mcp.WithString("project_path",
+			mcp.Required(),
+			mcp.Description("Absolute project path, or 'global' for global memory"),
+		),
+		mcp.WithString("filename",
+			mcp.Required(),
+			mcp.Description("Filename such as MEMORY.md, session-state.md, decisions.md"),
+		),
+		mcp.WithString("content",
+			mcp.Required(),
+			mcp.Description("File content to save"),
+		),
+		mcp.WithString("mode",
+			mcp.Description("Write mode: 'overwrite' (default) or 'append'"),
+		),
+	)
+}
+
+func buildLoadMemoryTool() mcp.Tool {
+	return mcp.NewTool(
+		"load_memory",
+		mcp.WithDescription("Load memory files from a project's .claude/memory/ directory. If filename is omitted, returns all .md files."),
+		mcp.WithString("project_path",
+			mcp.Required(),
+			mcp.Description("Absolute project path, or 'global' for global memory"),
+		),
+		mcp.WithString("filename",
+			mcp.Description("Specific filename to load; omit to list all memory files"),
+		),
+	)
+}
+
+func buildSearchMemoryTool() mcp.Tool {
+	return mcp.NewTool(
+		"search_memory",
+		mcp.WithDescription("Keyword search over memory files (case-insensitive exact match). For conceptual or semantic queries, prefer ov_search which finds related content even with different wording."),
+		mcp.WithString("query",
+			mcp.Required(),
+			mcp.Description("Search keyword (case-insensitive)"),
+		),
+		mcp.WithString("project_path",
+			mcp.Description("Limit search to a specific project path; omit to search all"),
+		),
+		mcp.WithNumber("max_results",
+			mcp.Description("Maximum number of matching lines to return (default 20)"),
+		),
+	)
+}
+
 // handleSaveMemory handles the save_memory tool call
 func handleSaveMemory(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	projectPath, err := req.RequireString("project_path")

@@ -12,6 +12,27 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
+func buildGetProjectConfigTool() mcp.Tool {
+	return mcp.NewTool(
+		"get_project_config",
+		mcp.WithDescription("Get an overview of a project's Claude Code configuration (.claude/ directory contents)."),
+		mcp.WithString("project_path",
+			mcp.Required(),
+			mcp.Description("Absolute project path"),
+		),
+	)
+}
+
+func buildListProjectsTool() mcp.Tool {
+	return mcp.NewTool(
+		"list_projects",
+		mcp.WithDescription("List all Claude Code managed projects found in ~/.claude/projects/."),
+		mcp.WithNumber("limit",
+			mcp.Description("Maximum number of projects to return (default 50)"),
+		),
+	)
+}
+
 // handleGetProjectConfig handles the get_project_config tool call
 func handleGetProjectConfig(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	projectPath, err := req.RequireString("project_path")

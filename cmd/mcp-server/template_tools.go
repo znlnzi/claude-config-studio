@@ -13,6 +13,63 @@ import (
 	"github.com/znlnzi/claude-config-studio/internal/templatedata"
 )
 
+func buildListTemplatesTool() mcp.Tool {
+	return mcp.NewTool(
+		"template_list",
+		mcp.WithDescription("List all available Claude Code configuration templates with categories, names, and descriptions."),
+	)
+}
+
+func buildInstallTemplateTool() mcp.Tool {
+	return mcp.NewTool(
+		"template_install",
+		mcp.WithDescription("Install a configuration template to a project or global scope. Writes rules, agents, skills, and commands files."),
+		mcp.WithString("template_id",
+			mcp.Required(),
+			mcp.Description("Template ID to install (e.g., 'hackathon-core', 'cross-session-memory')"),
+		),
+		mcp.WithString("scope",
+			mcp.Description("Install scope: 'project' (default) or 'global'"),
+		),
+		mcp.WithString("project_path",
+			mcp.Description("Absolute project path (required for project scope)"),
+		),
+		mcp.WithString("overwrite",
+			mcp.Description("Set to 'true' to overwrite existing files (default: 'false')"),
+		),
+	)
+}
+
+func buildUninstallTemplateTool() mcp.Tool {
+	return mcp.NewTool(
+		"template_uninstall",
+		mcp.WithDescription("Uninstall a template by removing its rules file (tpl-{id}.md)."),
+		mcp.WithString("template_id",
+			mcp.Required(),
+			mcp.Description("Template ID to uninstall"),
+		),
+		mcp.WithString("scope",
+			mcp.Description("Scope: 'project' (default) or 'global'"),
+		),
+		mcp.WithString("project_path",
+			mcp.Description("Absolute project path (required for project scope)"),
+		),
+	)
+}
+
+func buildGetInstalledTemplatesTool() mcp.Tool {
+	return mcp.NewTool(
+		"template_installed",
+		mcp.WithDescription("List installed templates in a project or global scope by scanning for tpl-*.md files in the rules directory."),
+		mcp.WithString("scope",
+			mcp.Description("Scope: 'project' (default) or 'global'"),
+		),
+		mcp.WithString("project_path",
+			mcp.Description("Absolute project path (required for project scope)"),
+		),
+	)
+}
+
 // handleListTemplates lists all available templates
 func handleListTemplates(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	categories := templatedata.GetAllTemplates()

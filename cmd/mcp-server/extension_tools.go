@@ -12,6 +12,78 @@ import (
 	"github.com/mark3labs/mcp-go/mcp"
 )
 
+func buildListExtensionsTool() mcp.Tool {
+	return mcp.NewTool(
+		"extension_list",
+		mcp.WithDescription("List extension files (agents, rules, skills, or commands) in a given scope."),
+		mcp.WithString("type",
+			mcp.Required(),
+			mcp.Description("Extension type: 'agents', 'rules', 'skills', or 'commands'"),
+		),
+		mcp.WithString("scope",
+			mcp.Description("Scope: 'global' (default) or absolute project path"),
+		),
+	)
+}
+
+func buildReadExtensionTool() mcp.Tool {
+	return mcp.NewTool(
+		"extension_read",
+		mcp.WithDescription("Read the content of a specific extension file."),
+		mcp.WithString("type",
+			mcp.Required(),
+			mcp.Description("Extension type: 'agents', 'rules', 'skills', or 'commands'"),
+		),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Extension name (without .md extension)"),
+		),
+		mcp.WithString("scope",
+			mcp.Description("Scope: 'global' (default) or absolute project path"),
+		),
+	)
+}
+
+func buildSaveExtensionTool() mcp.Tool {
+	return mcp.NewTool(
+		"extension_save",
+		mcp.WithDescription("Create or update an extension file (agent, rule, skill, or command)."),
+		mcp.WithString("type",
+			mcp.Required(),
+			mcp.Description("Extension type: 'agents', 'rules', 'skills', or 'commands'"),
+		),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Extension name (without .md extension)"),
+		),
+		mcp.WithString("content",
+			mcp.Required(),
+			mcp.Description("File content to write"),
+		),
+		mcp.WithString("scope",
+			mcp.Description("Scope: 'global' (default) or absolute project path"),
+		),
+	)
+}
+
+func buildDeleteExtensionTool() mcp.Tool {
+	return mcp.NewTool(
+		"extension_delete",
+		mcp.WithDescription("Delete an extension file."),
+		mcp.WithString("type",
+			mcp.Required(),
+			mcp.Description("Extension type: 'agents', 'rules', 'skills', or 'commands'"),
+		),
+		mcp.WithString("name",
+			mcp.Required(),
+			mcp.Description("Extension name (without .md extension)"),
+		),
+		mcp.WithString("scope",
+			mcp.Description("Scope: 'global' (default) or absolute project path"),
+		),
+	)
+}
+
 // resolveExtensionDir resolves the extension file directory.
 // extType: "agents", "rules", "skills", "commands"
 // scope: "global" or an absolute project path
