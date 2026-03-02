@@ -6,7 +6,7 @@ Thank you for your interest in contributing! This guide will help you get starte
 
 ### Prerequisites
 
-- Go 1.21+
+- Go 1.23+
 - Node.js 18+
 - Claude Code CLI (for testing MCP integration)
 

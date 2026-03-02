@@ -32,6 +32,8 @@
     "type": "git",
     "url": "git+https://github.com/znlnzi/claude-config-studio.git"
   },
+  "author": "asura",
+  "homepage": "https://github.com/znlnzi/claude-config-studio#readme",
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
