@@ -6,6 +6,9 @@ export default withMermaid(
     title: 'claude-config-mcp',
     description: 'MCP server for Claude Code configuration management and cross-session intelligent memory',
 
+    // Exclude legacy docs that are not part of the documentation site
+    srcExclude: ['API.md', 'cto/**', 'fullstack/**', 'marketing/**', 'operations/**'],
+
     themeConfig: {
       nav: [
         { text: 'Guide', link: '/guide/installation' },

@@ -20,7 +20,7 @@
 
 - [ ] Stable API: all MCP tool schemas frozen, breaking changes require major version
 - [ ] 80%+ test coverage across all packages
-- [ ] VitePress documentation site with guides and API reference
+- [x] VitePress documentation site with guides and API reference
 - [ ] Performance benchmarks for semantic search and recall
 - [ ] Windows CI testing in build matrix
 
