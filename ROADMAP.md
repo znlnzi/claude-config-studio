@@ -11,9 +11,9 @@
 
 ## v0.9.0 — Developer Experience
 
-- [ ] Interactive setup wizard improvements (smarter project detection)
+- [x] Interactive setup wizard improvements (smarter project detection via `detect_project` tool)
 - [ ] Template marketplace: community-contributed templates via GitHub
-- [ ] Better error messages with actionable fix suggestions
+- [x] Better error messages with actionable fix suggestions
 - [x] `--version` flag for the binary
 
 ## v1.0.0 — Production Ready

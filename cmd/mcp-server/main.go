@@ -29,6 +29,7 @@ Available tool categories:
 - Luoshu Memory: memory_extract, memory_semantic_search, luoshu_recall
 - Luoshu Status: luoshu_status, luoshu_reindex
 - Import/Export: export_config, import_config
+- Project Detection: detect_project
 - File Semantic Search: ov_search, ov_index, ov_status
 
 Luoshu recall (luoshu_recall):
@@ -154,6 +155,9 @@ func main() {
 	// ─── Config Import/Export ────────────────────────────────
 	s.AddTool(buildExportConfigTool(), handleExportConfig)
 	s.AddTool(buildImportConfigTool(), handleImportConfig)
+
+	// ─── Project Detection ──────────────────────────────────
+	s.AddTool(buildDetectProjectTool(), handleDetectProject)
 
 	// ─── MCP Resources ──────────────────────────────────────
 	registerResources(s)

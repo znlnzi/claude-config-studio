@@ -27,11 +27,17 @@ argument-hint: "[--reset 重新配置] [--upgrade 检查更新]"
 
 ### 1. 检测项目特征（自动，零操作）
 
-扫描当前项目目录，收集以下信息：
-- **语言/框架**: 检查 package.json / pyproject.toml / go.mod / Cargo.toml
-- **测试框架**: Jest/Vitest/pytest/go test 等
-- **包管理器**: npm/pnpm/yarn/pip/poetry/go
-- **Git 状态**: 是否初始化、最近 commit 作者（判断独立/团队）
+调用 `detect_project` 工具，传入当前项目路径。该工具一次调用即返回完整的项目特征：
+- **语言/框架**: 自动识别（TypeScript, Go, Python, Rust 等）
+- **测试框架**: 从依赖和配置文件中提取（Jest, Vitest, pytest, go test 等）
+- **包管理器**: 通过 lock 文件优先匹配（pnpm, yarn, npm, poetry 等）
+- **Git 状态**: 是否初始化、最近作者（判断独立/团队）、当前分支
+- **Claude 配置**: `.claude/` 目录和 `.setup-meta.json` 状态（可直接用于模式判断）
+
+返回结果中的 `claude_config` 字段可直接用于模式判断：
+- `has_claude_dir == false` → 模式 A（全新初始化）
+- `has_claude_dir == true && has_setup_meta == false` → 模式 B（注册现有配置）
+- `has_setup_meta == true` → 模式 C（增量升级）
 
 简洁呈现检测结果：
 
