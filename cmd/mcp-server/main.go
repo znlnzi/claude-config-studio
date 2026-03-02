@@ -78,9 +78,15 @@ Community resources:
 var serverVersion = "dev"
 
 func main() {
+	showVersion := flag.Bool("version", false, "Print version and exit")
 	transport := flag.String("transport", "stdio", "Transport mode: stdio or http")
 	httpAddr := flag.String("http-addr", "localhost:8080", "HTTP listen address (http mode only)")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(serverVersion)
+		os.Exit(0)
+	}
 
 	s := server.NewMCPServer(
 		"claude-config-mcp",
