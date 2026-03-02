@@ -3,6 +3,7 @@
 [English](README.md) | [中文](README.zh-CN.md)
 
 [![CI](https://github.com/znlnzi/claude-config-studio/actions/workflows/ci.yml/badge.svg)](https://github.com/znlnzi/claude-config-studio/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/znlnzi/claude-config-studio/graph/badge.svg)](https://codecov.io/gh/znlnzi/claude-config-studio)
 [![npm version](https://img.shields.io/npm/v/claude-config-mcp.svg)](https://www.npmjs.com/package/claude-config-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
