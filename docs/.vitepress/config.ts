@@ -5,6 +5,7 @@ export default withMermaid(
   defineConfig({
     title: 'claude-config-mcp',
     description: 'MCP server for Claude Code configuration management and cross-session intelligent memory',
+    base: '/claude-config-studio/',
 
     // Exclude legacy docs that are not part of the documentation site
     srcExclude: ['API.md', 'cto/**', 'fullstack/**', 'marketing/**', 'operations/**'],
