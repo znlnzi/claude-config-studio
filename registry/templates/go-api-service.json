@@ -1,0 +1,11 @@
+{
+  "id": "community/go-api-service",
+  "name": "Go API Service",
+  "category": "Backend",
+  "description": "Production-ready Go HTTP API patterns with structured logging, graceful shutdown, and middleware.",
+  "tags": ["go", "api", "rest", "middleware"],
+  "claudeMd": "# Go API Service Conventions\n\n## Project Layout\n```\ncmd/server/       — main entrypoint\ninternal/handler/  — HTTP handlers\ninternal/service/  — business logic\ninternal/repo/     — data access\ninternal/model/    — domain types\npkg/middleware/    — reusable middleware\n```\n\n## Handler Pattern\n- Handlers accept `(w http.ResponseWriter, r *http.Request)`\n- Extract params with `r.PathValue()` (Go 1.22+) or chi/mux\n- Validate input early, return `400` with structured error\n- Call service layer, never access DB directly\n- Use `encoding/json` for response marshaling\n\n## Error Handling\n- Define domain errors in `internal/model/errors.go`\n- Map domain errors to HTTP status in handler layer\n- Never expose internal error details to clients\n- Log full error with `slog.Error()`, return sanitized message\n\n## Middleware Stack\n1. Recovery (panic → 500)\n2. Request ID\n3. Structured logging\n4. CORS\n5. Auth (where needed)\n\n## Testing\n- Use `httptest.NewServer` for integration tests\n- Table-driven tests for handlers\n- Mock interfaces, not implementations\n- `t.Parallel()` for independent tests",
+  "rules": {
+    "go-api": "# Go API Rules\n\n- Use `net/http` ServeMux (Go 1.22+) or chi router\n- All handlers return `(http.ResponseWriter, *http.Request)` — no custom signatures\n- Use `slog` for structured logging, not `log` or `fmt.Println`\n- Graceful shutdown with `signal.NotifyContext`\n- Context propagation: pass `r.Context()` to service and repo layers\n- Database queries use `context.Context` as first parameter\n- Configuration via environment variables, parsed at startup"
+  }
+}

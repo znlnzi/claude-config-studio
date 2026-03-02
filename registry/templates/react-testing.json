@@ -1,0 +1,11 @@
+{
+  "id": "community/react-testing",
+  "name": "React Testing Best Practices",
+  "category": "Frontend",
+  "description": "Comprehensive React testing patterns with React Testing Library, Vitest, and MSW.",
+  "tags": ["react", "testing", "vitest", "msw"],
+  "claudeMd": "# React Testing Best Practices\n\n## Testing Philosophy\n- Test behavior, not implementation details\n- Write tests from the user's perspective\n- Prefer integration tests over unit tests for components\n- Use MSW for API mocking instead of mocking fetch/axios directly\n\n## Testing Library Conventions\n- Use `screen` queries instead of destructuring from `render()`\n- Prefer `getByRole` > `getByLabelText` > `getByText` > `getByTestId`\n- Use `userEvent` instead of `fireEvent` for realistic interactions\n- Always wrap state updates in `act()` or use `waitFor()`\n\n## Test Structure\n```\ndescribe('ComponentName', () => {\n  it('should render initial state correctly', () => {})\n  it('should handle user interaction', () => {})\n  it('should display error state', () => {})\n  it('should call API on submit', () => {})\n})\n```\n\n## MSW Setup\n- Define handlers in `src/mocks/handlers.ts`\n- Use `server.use()` for per-test overrides\n- Always reset handlers in `afterEach`\n\n## Coverage Requirements\n- Components: 80%+ branch coverage\n- Hooks: 90%+ coverage\n- Utils: 100% coverage",
+  "rules": {
+    "react-testing": "# React Testing Rules\n\n- Always use `@testing-library/react` for component tests\n- Never test implementation details (internal state, lifecycle methods)\n- Mock API calls with MSW, not jest.mock\n- Each test file mirrors source file: `Component.tsx` → `Component.test.tsx`\n- Snapshot tests are forbidden for dynamic components\n- Use `screen.getByRole` as the primary query method"
+  }
+}

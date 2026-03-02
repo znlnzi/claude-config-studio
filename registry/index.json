@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "updated_at": "2026-03-02T20:00:00Z",
+  "templates": [
+    {
+      "id": "community/react-testing",
+      "name": "React Testing Best Practices",
+      "description": "Comprehensive React testing patterns with React Testing Library, Vitest, and MSW.",
+      "author": "znlnzi",
+      "version": "1.0.0",
+      "category": "Frontend",
+      "tags": ["react", "testing", "vitest", "msw"],
+      "url": "https://raw.githubusercontent.com/znlnzi/claude-config-studio/main/registry/templates/react-testing.json",
+      "downloads": 0,
+      "stars": 0
+    },
+    {
+      "id": "community/typescript-strict",
+      "name": "TypeScript Strict Mode",
+      "description": "Strict TypeScript configuration with advanced type patterns and best practices.",
+      "author": "znlnzi",
+      "version": "1.0.0",
+      "category": "Frontend",
+      "tags": ["typescript", "types", "strict"],
+      "url": "https://raw.githubusercontent.com/znlnzi/claude-config-studio/main/registry/templates/typescript-strict.json",
+      "downloads": 0,
+      "stars": 0
+    },
+    {
+      "id": "community/go-api-service",
+      "name": "Go API Service",
+      "description": "Production-ready Go HTTP API patterns with structured logging, graceful shutdown, and middleware.",
+      "author": "znlnzi",
+      "version": "1.0.0",
+      "category": "Backend",
+      "tags": ["go", "api", "rest", "middleware"],
+      "url": "https://raw.githubusercontent.com/znlnzi/claude-config-studio/main/registry/templates/go-api-service.json",
+      "downloads": 0,
+      "stars": 0
+    },
+    {
+      "id": "community/python-fastapi",
+      "name": "Python FastAPI Project",
+      "description": "FastAPI project conventions with Pydantic V2, async SQLAlchemy, and pytest patterns.",
+      "author": "znlnzi",
+      "version": "1.0.0",
+      "category": "Backend",
+      "tags": ["python", "fastapi", "pydantic", "sqlalchemy"],
+      "url": "https://raw.githubusercontent.com/znlnzi/claude-config-studio/main/registry/templates/python-fastapi.json",
+      "downloads": 0,
+      "stars": 0
+    },
+    {
+      "id": "community/docker-compose",
+      "name": "Docker Compose Development",
+      "description": "Docker Compose patterns for local development with multi-service architectures.",
+      "author": "znlnzi",
+      "version": "1.0.0",
+      "category": "DevOps",
+      "tags": ["docker", "compose", "devops", "containers"],
+      "url": "https://raw.githubusercontent.com/znlnzi/claude-config-studio/main/registry/templates/docker-compose.json",
+      "downloads": 0,
+      "stars": 0
+    }
+  ]
+}

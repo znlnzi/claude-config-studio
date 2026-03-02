@@ -1,0 +1,11 @@
+{
+  "id": "community/python-fastapi",
+  "name": "Python FastAPI Project",
+  "category": "Backend",
+  "description": "FastAPI project conventions with Pydantic V2, async SQLAlchemy, and pytest patterns.",
+  "tags": ["python", "fastapi", "pydantic", "sqlalchemy"],
+  "claudeMd": "# FastAPI Project Conventions\n\n## Project Structure\n```\napp/\n  main.py          — FastAPI app factory\n  api/routes/      — route modules\n  api/deps.py      — dependency injection\n  models/          — SQLAlchemy models\n  schemas/         — Pydantic V2 schemas\n  services/        — business logic\n  core/config.py   — settings via pydantic-settings\ntests/\n  conftest.py      — fixtures\n  test_*.py        — test modules\n```\n\n## Conventions\n- Use `Annotated[T, Depends(...)]` for dependency injection\n- Pydantic V2 models with `model_config = ConfigDict(from_attributes=True)`\n- Async endpoints by default, sync only for CPU-bound work\n- Use `HTTPException` with detail dict, not plain string\n- Router prefix matches resource name: `/api/v1/users`\n\n## Database\n- Async SQLAlchemy 2.0 with `AsyncSession`\n- Alembic for migrations, auto-generate from models\n- Repository pattern for data access\n\n## Testing\n- Use `pytest-asyncio` with `async def test_*`\n- `httpx.AsyncClient` for API tests\n- Factory fixtures with `factory_boy`\n- Database tests use transaction rollback\n\n## Error Handling\n- Custom exception handlers in `app/api/exceptions.py`\n- Structured error response: `{\"detail\": {\"code\": \"...\", \"message\": \"...\"}}`",
+  "rules": {
+    "fastapi": "# FastAPI Rules\n\n- Type hints on ALL function parameters and return values\n- Use `Annotated` for dependency injection, not default parameter values\n- Pydantic V2 syntax: `model_validator`, `field_validator`, not V1 `validator`\n- Async by default: `async def` for all route handlers\n- Use `lifespan` context manager, not `on_event` decorators\n- Settings via `pydantic-settings`, never hardcode config values\n- Use `uv` for package management, `ruff` for linting"
+  }
+}

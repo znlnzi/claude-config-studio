@@ -1,0 +1,11 @@
+{
+  "id": "community/typescript-strict",
+  "name": "TypeScript Strict Mode",
+  "category": "Frontend",
+  "description": "Strict TypeScript configuration with advanced type patterns and best practices.",
+  "tags": ["typescript", "types", "strict"],
+  "claudeMd": "# TypeScript Strict Mode\n\n## Compiler Settings\nAll strict flags enabled: `strict: true` (includes `strictNullChecks`, `noImplicitAny`, `strictFunctionTypes`, etc.)\n\n## Type Patterns\n\n### Discriminated Unions over Enums\n```typescript\ntype Result<T> = { ok: true; value: T } | { ok: false; error: Error }\n```\n\n### Branded Types for Domain Safety\n```typescript\ntype UserId = string & { readonly __brand: 'UserId' }\ntype Email = string & { readonly __brand: 'Email' }\n```\n\n### Exhaustive Checks\n```typescript\nfunction assertNever(x: never): never {\n  throw new Error(`Unexpected: ${x}`)\n}\n```\n\n### Const Assertions\n```typescript\nconst ROLES = ['admin', 'user', 'viewer'] as const\ntype Role = (typeof ROLES)[number]\n```\n\n## Forbidden Patterns\n- No `any` — use `unknown` and narrow\n- No `!` non-null assertion — use proper null checks\n- No `@ts-ignore` — use `@ts-expect-error` with explanation\n- No `as` type assertion — use type guards\n- No `enum` — use `as const` objects or union types",
+  "rules": {
+    "typescript-strict": "# TypeScript Strict Rules\n\n- `any` is forbidden. Use `unknown` and type narrowing\n- Never use `!` (non-null assertion). Handle null/undefined explicitly\n- Prefer `interface` for object shapes, `type` for unions and intersections\n- Use `satisfies` operator for type checking without widening\n- Generic type parameters: `T` for value, `K` for key, `E` for error\n- Return types must be explicit on exported functions\n- Use `readonly` for arrays and objects that should not be mutated"
+  }
+}

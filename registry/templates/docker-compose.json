@@ -1,0 +1,8 @@
+{
+  "id": "community/docker-compose",
+  "name": "Docker Compose Development",
+  "category": "DevOps",
+  "description": "Docker Compose patterns for local development with multi-service architectures.",
+  "tags": ["docker", "compose", "devops", "containers"],
+  "claudeMd": "# Docker Compose Development\n\n## File Organization\n```\ndocker-compose.yml          — base services\ndocker-compose.override.yml — local dev overrides (auto-loaded)\ndocker-compose.prod.yml     — production overrides\n.env                        — environment variables\n```\n\n## Conventions\n- Use named volumes for persistent data (databases)\n- Use bind mounts for source code in development\n- Define health checks for all services\n- Use `depends_on` with `condition: service_healthy`\n- Network isolation: frontend/backend/db networks\n\n## Service Naming\n- `app` — main application\n- `db` — primary database\n- `cache` — Redis/Memcached\n- `queue` — message broker\n- `worker` — background job processor\n\n## Environment Variables\n- `.env` for shared defaults\n- `environment:` in compose for service-specific\n- Never commit secrets to `.env` — use `.env.example` as template\n\n## Development Tips\n- `docker compose up -d` — start all services\n- `docker compose logs -f app` — follow app logs\n- `docker compose exec app sh` — shell into container\n- `docker compose down -v` — stop and remove volumes"
+}
