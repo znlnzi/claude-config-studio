@@ -72,7 +72,10 @@ Community resources:
 - github.com/anthropics/claude-code — Official Claude Code repository
 - github.com/VoltAgent/awesome-claude-code-subagents — 100+ specialized subagents`
 
-const serverVersion = "0.7.2"
+// serverVersion is set at build time via ldflags:
+//
+//	go build -ldflags "-X main.serverVersion=0.8.0" ./cmd/mcp-server/
+var serverVersion = "dev"
 
 func main() {
 	transport := flag.String("transport", "stdio", "Transport mode: stdio or http")

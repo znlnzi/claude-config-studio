@@ -6,13 +6,17 @@ MCP_PKG = ./cmd/mcp-server/
 INSTALL_DIR = $(HOME)/.local/bin
 CLAUDE_DIR = $(HOME)/.claude
 
+# Version from npm/package.json (single source of truth)
+VERSION := $(shell node -p "require('./npm/package.json').version" 2>/dev/null || echo "dev")
+LDFLAGS = -ldflags "-X main.serverVersion=$(VERSION)"
+
 # npm multi-platform build
 PLATFORMS = darwin-arm64 darwin-amd64 linux-amd64 linux-arm64 windows-amd64
 
 # Build MCP Server only (no Wails dependency)
 mcp:
-	go build -o $(MCP_BIN) $(MCP_PKG)
-	@echo "Built $(MCP_BIN)"
+	go build $(LDFLAGS) -o $(MCP_BIN) $(MCP_PKG)
+	@echo "Built $(MCP_BIN) (v$(VERSION))"
 
 # Build everything (includes Wails desktop app)
 build: mcp
@@ -61,8 +65,8 @@ uninstall:
 # Run lint, build, and tests
 test:
 	go vet $(MCP_PKG) ./internal/... ./services/...
-	go build $(MCP_PKG)
-	go test ./internal/... -count=1
+	go build $(LDFLAGS) $(MCP_PKG)
+	go test ./cmd/mcp-server/ ./internal/... -count=1
 	@echo "All checks passed."
 
 # Cross-compile MCP Server for all npm platforms
@@ -74,7 +78,7 @@ npm-build:
 		ext=""; [ "$$os" = "windows" ] && ext=".exe"; \
 		mkdir -p npm/platforms/$$npm_platform/bin; \
 		echo "Building $$os/$$arch → npm/platforms/$$npm_platform/bin/claude-config-mcp$$ext"; \
-		CGO_ENABLED=0 GOOS=$$os GOARCH=$$arch go build -o npm/platforms/$$npm_platform/bin/claude-config-mcp$$ext $(MCP_PKG); \
+		CGO_ENABLED=0 GOOS=$$os GOARCH=$$arch go build $(LDFLAGS) -o npm/platforms/$$npm_platform/bin/claude-config-mcp$$ext $(MCP_PKG); \
 	done
 	@echo "All platforms built."
 
