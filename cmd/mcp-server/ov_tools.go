@@ -53,13 +53,13 @@ func handleOvSearch(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallTool
 
 	cfg, err := luoshu.Load()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to load config: %v", err)), nil
+		return mcp.NewToolResultError(errConfigLoad(err)), nil
 	}
 
 	_, embedder := luoshu.NewProviders(cfg)
 	cache, err := luoshu.NewEmbeddingCache()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize cache: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("embedding cache", err)), nil
 	}
 
 	ci := luoshu.NewClaudeIndex(embedder, cache, cfg.Embedding.Model)
@@ -69,7 +69,7 @@ func handleOvSearch(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallTool
 
 	results, err := ci.Search(ctx, query, scope, limit)
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Search failed: %v", err)), nil
+		return mcp.NewToolResultError(errSearchFailed(err)), nil
 	}
 
 	output := map[string]interface{}{
@@ -112,7 +112,7 @@ func handleOvIndex(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolR
 
 	cfg, err := luoshu.Load()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to load config: %v", err)), nil
+		return mcp.NewToolResultError(errConfigLoad(err)), nil
 	}
 
 	_, embedder := luoshu.NewProviders(cfg)
@@ -122,7 +122,7 @@ func handleOvIndex(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolR
 
 	cache, err := luoshu.NewEmbeddingCache()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize cache: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("embedding cache", err)), nil
 	}
 
 	ci := luoshu.NewClaudeIndex(embedder, cache, cfg.Embedding.Model)
@@ -132,7 +132,7 @@ func handleOvIndex(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolR
 
 	if force {
 		if err := ci.Reindex(ctx, scope); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("Failed to rebuild index: %v", err)), nil
+			return mcp.NewToolResultError(fmt.Sprintf("failed to rebuild index: %v. Check embedding API connection with luoshu_config_validate", err)), nil
 		}
 		status, _ := ci.Status(scope)
 		changes = status.IndexedFiles
@@ -140,7 +140,7 @@ func handleOvIndex(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolR
 		var err error
 		changes, err = ci.Reconcile(ctx, scope)
 		if err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("Incremental sync failed: %v", err)), nil
+			return mcp.NewToolResultError(fmt.Sprintf("incremental sync failed: %v. Check embedding API connection with luoshu_config_validate", err)), nil
 		}
 	}
 
@@ -174,7 +174,7 @@ func buildOvStatusTool() mcp.Tool {
 func handleOvStatus(_ context.Context, _ mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	cfg, err := luoshu.Load()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to load config: %v", err)), nil
+		return mcp.NewToolResultError(errConfigLoad(err)), nil
 	}
 
 	embedConfigured := cfg.Embedding.APIKey != ""
@@ -185,7 +185,7 @@ func handleOvStatus(_ context.Context, _ mcp.CallToolRequest) (*mcp.CallToolResu
 	_, embedder := luoshu.NewProviders(cfg)
 	cache, err := luoshu.NewEmbeddingCache()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize cache: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("embedding cache", err)), nil
 	}
 
 	ci := luoshu.NewClaudeIndex(embedder, cache, cfg.Embedding.Model)

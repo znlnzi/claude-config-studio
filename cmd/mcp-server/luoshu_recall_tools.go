@@ -39,22 +39,22 @@ func handleLuoshuRecall(ctx context.Context, req mcp.CallToolRequest) (*mcp.Call
 
 	cfg, err := luoshu.Load()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to load config: %v", err)), nil
+		return mcp.NewToolResultError(errConfigLoad(err)), nil
 	}
 
 	llm, embedder := luoshu.NewProviders(cfg)
 
 	store, err := luoshu.NewMemoryStore()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize store: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("memory store", err)), nil
 	}
 	index, err := luoshu.NewVectorIndex()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize index: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("vector index", err)), nil
 	}
 	cache, err := luoshu.NewEmbeddingCache()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize cache: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("embedding cache", err)), nil
 	}
 
 	searcher := luoshu.NewSearcher(store, index, cache, embedder, cfg.Embedding.Model)
@@ -70,7 +70,7 @@ func handleLuoshuRecall(ctx context.Context, req mcp.CallToolRequest) (*mcp.Call
 		Mode:        "auto",
 	})
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Recall failed: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("recall failed: %v. Check LLM and embedding configuration with luoshu_config_validate", err)), nil
 	}
 
 	data, _ := json.MarshalIndent(result, "", "  ")

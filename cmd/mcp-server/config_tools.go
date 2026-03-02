@@ -41,7 +41,7 @@ func handleGetProjectConfig(ctx context.Context, req mcp.CallToolRequest) (*mcp.
 	}
 
 	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
-		return mcp.NewToolResultError(fmt.Sprintf("project path does not exist: %s", projectPath)), nil
+		return mcp.NewToolResultError(errPathNotFound(projectPath)), nil
 	}
 
 	claudeDir := filepath.Join(projectPath, ".claude")
@@ -106,7 +106,7 @@ func handleListProjects(ctx context.Context, req mcp.CallToolRequest) (*mcp.Call
 
 	projDir, err := getProjectsDir()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to get projects dir: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("failed to get projects dir: %v. Check ~/.claude/projects/ exists", err)), nil
 	}
 
 	entries, err := os.ReadDir(projDir)

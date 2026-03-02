@@ -52,7 +52,7 @@ func handleEvolveStatus(_ context.Context, _ mcp.CallToolRequest) (*mcp.CallTool
 	store := getEvolveStore()
 	status, err := store.GetStatus()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to get status: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("failed to get evolution status: %v. Check ~/.claude/evolution/ directory permissions", err)), nil
 	}
 
 	// Append pending suggestion summaries
@@ -93,25 +93,25 @@ func handleEvolveAnalyze(_ context.Context, request mcp.CallToolRequest) (*mcp.C
 	// Check if rules directory exists
 	rulesDir := filepath.Join(claudeDir, "rules")
 	if _, err := os.Stat(rulesDir); os.IsNotExist(err) {
-		return mcp.NewToolResultError(fmt.Sprintf("no rules directory found at %s", rulesDir)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("no rules directory found at %s. Create rules files first or check the scope path", rulesDir)), nil
 	}
 
 	// Execute analysis
 	analyzer := evolution.NewAnalyzer(claudeDir, scope)
 	suggestions, record, err := analyzer.Analyze()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("analysis failed: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("analysis failed: %v. Check that rules files are valid Markdown", err)), nil
 	}
 
 	// Save results
 	store := getEvolveStore()
 	if len(suggestions) > 0 {
 		if err := store.AddSuggestions(suggestions); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to save suggestions: %v", err)), nil
+			return mcp.NewToolResultError(fmt.Sprintf("failed to save suggestions: %v. Check ~/.claude/evolution/ directory permissions", err)), nil
 		}
 	}
 	if err := store.AddHistory(record); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to save history: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("failed to save analysis history: %v. Check ~/.claude/evolution/ directory permissions", err)), nil
 	}
 
 	result := map[string]interface{}{
@@ -145,7 +145,7 @@ func handleEvolveApply(_ context.Context, request mcp.CallToolRequest) (*mcp.Cal
 	// Find the suggestion
 	suggestions, err := store.LoadSuggestions()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to load suggestions: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("failed to load suggestions: %v. Check ~/.claude/evolution/ directory permissions", err)), nil
 	}
 
 	var target *evolution.Suggestion
@@ -157,7 +157,7 @@ func handleEvolveApply(_ context.Context, request mcp.CallToolRequest) (*mcp.Cal
 	}
 
 	if target == nil {
-		return mcp.NewToolResultError(fmt.Sprintf("suggestion not found: %s", suggestionID)), nil
+		return mcp.NewToolResultError(errSuggestionNotFound(suggestionID)), nil
 	}
 
 	if target.Status != "pending" {
@@ -171,7 +171,7 @@ func handleEvolveApply(_ context.Context, request mcp.CallToolRequest) (*mcp.Cal
 	}
 
 	if err := store.UpdateSuggestionStatus(suggestionID, newStatus); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to update: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("failed to update suggestion %s: %v. Check ~/.claude/evolution/ directory permissions", suggestionID, err)), nil
 	}
 
 	result := map[string]interface{}{
@@ -204,7 +204,7 @@ func resolveClaudeDirForScope(scope string) (string, error) {
 		return filepath.Join(home, ".claude"), nil
 	}
 	if _, err := os.Stat(scope); os.IsNotExist(err) {
-		return "", fmt.Errorf("path does not exist: %s", scope)
+		return "", fmt.Errorf("path does not exist: %s. Verify the absolute path is correct", scope)
 	}
 	return filepath.Join(scope, ".claude"), nil
 }

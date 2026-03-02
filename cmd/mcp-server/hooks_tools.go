@@ -48,7 +48,7 @@ func handleHooksList(_ context.Context, request mcp.CallToolRequest) (*mcp.CallT
 
 	events, err := readHooksFromSettings(settingsPath)
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to read hooks: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("failed to read hooks from %s: %v. Check that settings.json exists and is valid JSON", settingsPath, err)), nil
 	}
 
 	result := map[string]interface{}{
@@ -71,7 +71,7 @@ func handleHooksSave(_ context.Context, request mcp.CallToolRequest) (*mcp.CallT
 	// Validate hooks JSON format
 	var hooksObj map[string]json.RawMessage
 	if err := json.Unmarshal([]byte(hooksStr), &hooksObj); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("invalid hooks JSON: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("invalid hooks JSON: %v. Ensure the hooks parameter is a valid JSON object", err)), nil
 	}
 
 	// Validate event names
@@ -96,7 +96,7 @@ func handleHooksSave(_ context.Context, request mcp.CallToolRequest) (*mcp.CallT
 	}
 
 	if err := writeHooksToSettings(settingsPath, hooksStr); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to save hooks: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("failed to save hooks to %s: %v. Check file permissions", settingsPath, err)), nil
 	}
 
 	result := map[string]interface{}{
@@ -122,7 +122,7 @@ func resolveSettingsPath(scope string) (string, error) {
 	}
 	// project scope
 	if _, err := os.Stat(scope); os.IsNotExist(err) {
-		return "", fmt.Errorf("project path does not exist: %s", scope)
+		return "", fmt.Errorf("project path does not exist: %s. Verify the absolute path is correct", scope)
 	}
 	return filepath.Join(scope, ".claude", "settings.json"), nil
 }

@@ -51,7 +51,7 @@ func registerResources(s *server.MCPServer) {
 func handleGlobalClaudeMD(_ context.Context, _ mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get home directory: %w", err)
+		return nil, fmt.Errorf("failed to resolve home directory: %w. Check $HOME environment variable", err)
 	}
 
 	filePath := filepath.Join(home, ".claude", "CLAUDE.md")
@@ -66,7 +66,7 @@ func handleGlobalClaudeMD(_ context.Context, _ mcp.ReadResourceRequest) ([]mcp.R
 				},
 			}, nil
 		}
-		return nil, fmt.Errorf("failed to read CLAUDE.md: %w", err)
+		return nil, fmt.Errorf("failed to read CLAUDE.md: %w. Check file permissions", err)
 	}
 
 	return []mcp.ResourceContents{
@@ -82,18 +82,18 @@ func handleGlobalClaudeMD(_ context.Context, _ mcp.ReadResourceRequest) ([]mcp.R
 func handleGlobalMemoryFile(_ context.Context, req mcp.ReadResourceRequest) ([]mcp.ResourceContents, error) {
 	filename := extractURIParam(req.Params.URI, "claude://global/memory/")
 	if !isResourceSafeFilename(filename) {
-		return nil, fmt.Errorf("invalid filename: %s", filename)
+		return nil, fmt.Errorf("invalid filename: %s. Filename must end in .md and cannot contain '..' or path separators", filename)
 	}
 
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get home directory: %w", err)
+		return nil, fmt.Errorf("failed to resolve home directory: %w. Check $HOME environment variable", err)
 	}
 
 	filePath := filepath.Join(home, ".claude", "memory", filename)
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read memory file: %w", err)
+		return nil, fmt.Errorf("failed to read memory file %s: %w. Check that the file exists", filename, err)
 	}
 
 	return []mcp.ResourceContents{
@@ -111,30 +111,30 @@ func handleProjectMemoryFile(_ context.Context, req mcp.ReadResourceRequest) ([]
 	uri := req.Params.URI
 	const prefix = "claude://project/"
 	if !strings.HasPrefix(uri, prefix) {
-		return nil, fmt.Errorf("invalid URI format: %s", uri)
+		return nil, fmt.Errorf("invalid URI format: %s. Expected claude://project/{path}/memory/{filename}", uri)
 	}
 
 	rest := uri[len(prefix):]
 	const memorySegment = "/memory/"
 	memIdx := strings.LastIndex(rest, memorySegment)
 	if memIdx < 0 {
-		return nil, fmt.Errorf("invalid URI format, missing /memory/ segment: %s", uri)
+		return nil, fmt.Errorf("invalid URI format, missing /memory/ segment: %s. Expected claude://project/{path}/memory/{filename}", uri)
 	}
 
 	projectPath := rest[:memIdx]
 	filename := rest[memIdx+len(memorySegment):]
 
 	if !isResourceSafeFilename(filename) {
-		return nil, fmt.Errorf("invalid filename: %s", filename)
+		return nil, fmt.Errorf("invalid filename: %s. Filename must end in .md and cannot contain '..' or path separators", filename)
 	}
 	if !isResourceSafePath(projectPath) {
-		return nil, fmt.Errorf("invalid project path: %s", projectPath)
+		return nil, fmt.Errorf("invalid project path: %s. Path must be absolute and cannot contain '..'", projectPath)
 	}
 
 	filePath := filepath.Join(projectPath, ".claude", "memory", filename)
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read memory file: %w", err)
+		return nil, fmt.Errorf("failed to read memory file %s: %w. Check that the file exists", filename, err)
 	}
 
 	return []mcp.ResourceContents{

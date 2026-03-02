@@ -23,7 +23,7 @@ func buildLuoshuStatusTool() mcp.Tool {
 func handleLuoshuStatus(_ context.Context, _ mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	cfg, err := luoshu.Load()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to load config: %v", err)), nil
+		return mcp.NewToolResultError(errConfigLoad(err)), nil
 	}
 
 	llmConfigured := cfg.LLM.APIKey != ""
@@ -77,7 +77,7 @@ func buildLuoshuReindexTool() mcp.Tool {
 func handleLuoshuReindex(ctx context.Context, _ mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	cfg, err := luoshu.Load()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to load config: %v", err)), nil
+		return mcp.NewToolResultError(errConfigLoad(err)), nil
 	}
 
 	_, embedder := luoshu.NewProviders(cfg)
@@ -87,12 +87,12 @@ func handleLuoshuReindex(ctx context.Context, _ mcp.CallToolRequest) (*mcp.CallT
 
 	store, err := luoshu.NewMemoryStore()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize store: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("memory store", err)), nil
 	}
 
 	entries, err := store.LoadAll()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to load memories: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("failed to load memories: %v. Check ~/.luoshu/memories.jsonl file permissions", err)), nil
 	}
 
 	if len(entries) == 0 {
@@ -101,12 +101,12 @@ func handleLuoshuReindex(ctx context.Context, _ mcp.CallToolRequest) (*mcp.CallT
 
 	index, err := luoshu.NewVectorIndex()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize index: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("vector index", err)), nil
 	}
 
 	cache, err := luoshu.NewEmbeddingCache()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize cache: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("embedding cache", err)), nil
 	}
 
 	start := time.Now()

@@ -45,7 +45,7 @@ func handleExportConfig(_ context.Context, req mcp.CallToolRequest) (*mcp.CallTo
 			return mcp.NewToolResultError("project_path is required when scope is 'project'"), nil
 		}
 		if _, statErr := os.Stat(projectPath); os.IsNotExist(statErr) {
-			return mcp.NewToolResultError(fmt.Sprintf("project path does not exist: %s", projectPath)), nil
+			return mcp.NewToolResultError(errPathNotFound(projectPath)), nil
 		}
 		result, err = exporter.ExportProjectConfig(projectPath)
 	default:
@@ -53,7 +53,7 @@ func handleExportConfig(_ context.Context, req mcp.CallToolRequest) (*mcp.CallTo
 	}
 
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Export failed: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("export failed: %v. Check that the .claude/ directory exists and has readable files", err)), nil
 	}
 
 	output := map[string]interface{}{
@@ -105,7 +105,7 @@ func handleImportConfig(_ context.Context, req mcp.CallToolRequest) (*mcp.CallTo
 
 	result, err := exporter.ImportConfig(targetPath, base64Data)
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Import failed: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("import failed: %v. Check that the target path exists and the base64 data is valid", err)), nil
 	}
 
 	output := map[string]interface{}{

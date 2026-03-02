@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -56,7 +55,7 @@ func buildSaveProjectConfigTool() mcp.Tool {
 func handleGetGlobalConfig(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to get home dir: %v", err)), nil
+		return mcp.NewToolResultError(errHomeDir(err)), nil
 	}
 
 	claudeHome := filepath.Join(home, ".claude")
@@ -116,12 +115,12 @@ func handleSaveGlobalConfig(ctx context.Context, req mcp.CallToolRequest) (*mcp.
 
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to get home dir: %v", err)), nil
+		return mcp.NewToolResultError(errHomeDir(err)), nil
 	}
 
 	claudeHome := filepath.Join(home, ".claude")
 	if err := os.MkdirAll(claudeHome, 0755); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to create directory: %v", err)), nil
+		return mcp.NewToolResultError(errCreateDir(claudeHome, err)), nil
 	}
 
 	var targetPath string
@@ -131,13 +130,13 @@ func handleSaveGlobalConfig(ctx context.Context, req mcp.CallToolRequest) (*mcp.
 	case "settings":
 		targetPath = filepath.Join(claudeHome, "settings.json")
 		if !isValidJSON(content) {
-			return mcp.NewToolResultError("invalid JSON content for settings"), nil
+			return mcp.NewToolResultError("invalid JSON for settings. Ensure the content is valid JSON"), nil
 		}
 		content = formatJSON(content)
 	case "mcp":
 		targetPath = filepath.Join(claudeHome, ".mcp.json")
 		if !isValidJSON(content) {
-			return mcp.NewToolResultError("invalid JSON content for mcp config"), nil
+			return mcp.NewToolResultError("invalid JSON for mcp config. Ensure the content is valid JSON"), nil
 		}
 		content = formatJSON(content)
 	default:
@@ -145,7 +144,7 @@ func handleSaveGlobalConfig(ctx context.Context, req mcp.CallToolRequest) (*mcp.
 	}
 
 	if err := os.WriteFile(targetPath, []byte(content), 0644); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to write %s: %v", targetPath, err)), nil
+		return mcp.NewToolResultError(errWriteFailed(targetPath, err)), nil
 	}
 
 	result := map[string]interface{}{
@@ -173,12 +172,12 @@ func handleSaveProjectConfig(ctx context.Context, req mcp.CallToolRequest) (*mcp
 	}
 
 	if _, err := os.Stat(projectPath); os.IsNotExist(err) {
-		return mcp.NewToolResultError(fmt.Sprintf("project path does not exist: %s", projectPath)), nil
+		return mcp.NewToolResultError(errPathNotFound(projectPath)), nil
 	}
 
 	claudeDir := filepath.Join(projectPath, ".claude")
 	if err := os.MkdirAll(claudeDir, 0755); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to create directory: %v", err)), nil
+		return mcp.NewToolResultError(errCreateDir(claudeDir, err)), nil
 	}
 
 	var targetPath string
@@ -188,13 +187,13 @@ func handleSaveProjectConfig(ctx context.Context, req mcp.CallToolRequest) (*mcp
 	case "settings":
 		targetPath = filepath.Join(claudeDir, "settings.json")
 		if !isValidJSON(content) {
-			return mcp.NewToolResultError("invalid JSON content for settings"), nil
+			return mcp.NewToolResultError("invalid JSON for settings. Ensure the content is valid JSON"), nil
 		}
 		content = formatJSON(content)
 	case "mcp":
 		targetPath = filepath.Join(claudeDir, ".mcp.json")
 		if !isValidJSON(content) {
-			return mcp.NewToolResultError("invalid JSON content for mcp config"), nil
+			return mcp.NewToolResultError("invalid JSON for mcp config. Ensure the content is valid JSON"), nil
 		}
 		content = formatJSON(content)
 	default:
@@ -202,7 +201,7 @@ func handleSaveProjectConfig(ctx context.Context, req mcp.CallToolRequest) (*mcp
 	}
 
 	if err := os.WriteFile(targetPath, []byte(content), 0644); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to write %s: %v", targetPath, err)), nil
+		return mcp.NewToolResultError(errWriteFailed(targetPath, err)), nil
 	}
 
 	result := map[string]interface{}{

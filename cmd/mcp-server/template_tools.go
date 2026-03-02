@@ -132,7 +132,7 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 
 	tmpl := templatedata.GetTemplateByID(templateID)
 	if tmpl == nil {
-		return mcp.NewToolResultError(fmt.Sprintf("template not found: %s", templateID)), nil
+		return mcp.NewToolResultError(errTemplateNotFound(templateID)), nil
 	}
 
 	// Determine .claude directory
@@ -140,7 +140,7 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 	if scope == "global" {
 		home, err := os.UserHomeDir()
 		if err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to get home dir: %v", err)), nil
+			return mcp.NewToolResultError(errHomeDir(err)), nil
 		}
 		claudeDir = filepath.Join(home, ".claude")
 	} else {
@@ -148,13 +148,13 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 			return mcp.NewToolResultError("project_path is required for project scope"), nil
 		}
 		if _, err := os.Stat(projectPath); os.IsNotExist(err) {
-			return mcp.NewToolResultError(fmt.Sprintf("project path does not exist: %s", projectPath)), nil
+			return mcp.NewToolResultError(errPathNotFound(projectPath)), nil
 		}
 		claudeDir = filepath.Join(projectPath, ".claude")
 	}
 
 	if err := os.MkdirAll(claudeDir, 0755); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to create .claude dir: %v", err)), nil
+		return mcp.NewToolResultError(errCreateDir(claudeDir, err)), nil
 	}
 	var installedFiles []string
 
@@ -162,13 +162,13 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 	if tmpl.ClaudeMd != "" {
 		rulesDir := filepath.Join(claudeDir, "rules")
 		if err := os.MkdirAll(rulesDir, 0755); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to create rules dir: %v", err)), nil
+			return mcp.NewToolResultError(errCreateDir(rulesDir, err)), nil
 		}
 		header := fmt.Sprintf("<!-- template: %s | %s -->\n\n", tmpl.ID, tmpl.Name)
 		content := header + tmpl.ClaudeMd
 		filePath := filepath.Join(rulesDir, "tpl-"+tmpl.ID+".md")
 		if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to write template rule: %v", err)), nil
+			return mcp.NewToolResultError(errWriteFailed(filePath, err)), nil
 		}
 		installedFiles = append(installedFiles, "rules/tpl-"+tmpl.ID+".md")
 	}
@@ -176,7 +176,7 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 	// Install agents
 	if len(tmpl.Agents) > 0 {
 		if err := templatedata.WriteExtensionFiles(claudeDir, "agents", tmpl.Agents, overwrite); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to write agents: %v", err)), nil
+			return mcp.NewToolResultError(fmt.Sprintf("failed to write agents: %v. Check directory permissions for %s/agents/", err, claudeDir)), nil
 		}
 		for name := range tmpl.Agents {
 			installedFiles = append(installedFiles, "agents/"+name+".md")
@@ -186,7 +186,7 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 	// Install commands
 	if len(tmpl.Commands) > 0 {
 		if err := templatedata.WriteExtensionFiles(claudeDir, "commands", tmpl.Commands, overwrite); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to write commands: %v", err)), nil
+			return mcp.NewToolResultError(fmt.Sprintf("failed to write commands: %v. Check directory permissions for %s/commands/", err, claudeDir)), nil
 		}
 		for name := range tmpl.Commands {
 			installedFiles = append(installedFiles, "commands/"+name+".md")
@@ -196,7 +196,7 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 	// Install skills
 	if len(tmpl.Skills) > 0 {
 		if err := templatedata.WriteSkillFiles(claudeDir, tmpl.Skills, overwrite); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to write skills: %v", err)), nil
+			return mcp.NewToolResultError(fmt.Sprintf("failed to write skills: %v. Check directory permissions for %s/skills/", err, claudeDir)), nil
 		}
 		for name := range tmpl.Skills {
 			installedFiles = append(installedFiles, "skills/"+name+"/SKILL.md")
@@ -206,7 +206,7 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 	// Install additional rules bundled with the template
 	if len(tmpl.Rules) > 0 {
 		if err := templatedata.WriteExtensionFiles(claudeDir, "rules", tmpl.Rules, overwrite); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to write rules: %v", err)), nil
+			return mcp.NewToolResultError(fmt.Sprintf("failed to write rules: %v. Check directory permissions for %s/rules/", err, claudeDir)), nil
 		}
 		for name := range tmpl.Rules {
 			installedFiles = append(installedFiles, "rules/"+name+".md")
@@ -217,7 +217,7 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 	if len(tmpl.Scripts) > 0 {
 		scriptsDir := filepath.Join(claudeDir, "scripts")
 		if err := os.MkdirAll(scriptsDir, 0755); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to create scripts dir: %v", err)), nil
+			return mcp.NewToolResultError(errCreateDir(scriptsDir, err)), nil
 		}
 		for name, content := range tmpl.Scripts {
 			scriptPath := filepath.Join(scriptsDir, name)
@@ -227,7 +227,7 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 				}
 			}
 			if err := os.WriteFile(scriptPath, []byte(content), 0755); err != nil {
-				return mcp.NewToolResultError(fmt.Sprintf("failed to write script %s: %v", name, err)), nil
+				return mcp.NewToolResultError(errWriteFailed(scriptPath, err)), nil
 			}
 			installedFiles = append(installedFiles, "scripts/"+name)
 		}
@@ -236,7 +236,7 @@ func handleInstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 	// Merge settings.json
 	if tmpl.Settings != nil {
 		if err := templatedata.MergeAndWriteJSON(filepath.Join(claudeDir, "settings.json"), tmpl.Settings); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to merge settings: %v", err)), nil
+			return mcp.NewToolResultError(fmt.Sprintf("failed to merge settings.json: %v. Check file permissions for %s/settings.json", err, claudeDir)), nil
 		}
 		installedFiles = append(installedFiles, "settings.json (merged)")
 	}
@@ -267,7 +267,7 @@ func handleUninstallTemplate(ctx context.Context, req mcp.CallToolRequest) (*mcp
 	if scope == "global" {
 		home, err := os.UserHomeDir()
 		if err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to get home dir: %v", err)), nil
+			return mcp.NewToolResultError(errHomeDir(err)), nil
 		}
 		rulesDir = filepath.Join(home, ".claude", "rules")
 	} else {
@@ -308,7 +308,7 @@ func handleGetInstalledTemplates(ctx context.Context, req mcp.CallToolRequest) (
 	if scope == "global" {
 		home, err := os.UserHomeDir()
 		if err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to get home dir: %v", err)), nil
+			return mcp.NewToolResultError(errHomeDir(err)), nil
 		}
 		rulesDir = filepath.Join(home, ".claude", "rules")
 	} else {

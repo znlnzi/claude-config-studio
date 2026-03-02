@@ -50,7 +50,7 @@ func buildLuoshuConfigValidateTool() mcp.Tool {
 func handleLuoshuConfigGet(_ context.Context, req mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	cfg, err := luoshu.Load()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to load config: %v", err)), nil
+		return mcp.NewToolResultError(errConfigLoad(err)), nil
 	}
 
 	section := req.GetString("section", "")
@@ -71,7 +71,7 @@ func handleLuoshuConfigGet(_ context.Context, req mcp.CallToolRequest) (*mcp.Cal
 	case "":
 		output = masked
 	default:
-		return mcp.NewToolResultError(fmt.Sprintf("Unknown section: %s (valid options: llm, embedding, memory, reminder)", section)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("unknown section: %s. Valid options: llm, embedding, memory, reminder", section)), nil
 	}
 
 	data, _ := json.MarshalIndent(output, "", "  ")
@@ -90,7 +90,7 @@ func handleLuoshuConfigSet(_ context.Context, req mcp.CallToolRequest) (*mcp.Cal
 
 	cfg, err := luoshu.Load()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to load config: %v", err)), nil
+		return mcp.NewToolResultError(errConfigLoad(err)), nil
 	}
 
 	if err := applyConfigValue(cfg, key, value); err != nil {
@@ -98,7 +98,7 @@ func handleLuoshuConfigSet(_ context.Context, req mcp.CallToolRequest) (*mcp.Cal
 	}
 
 	if err := luoshu.Save(cfg); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to save config: %v", err)), nil
+		return mcp.NewToolResultError(errConfigSave(err)), nil
 	}
 
 	result := map[string]interface{}{
@@ -125,7 +125,7 @@ func handleLuoshuConfigSet(_ context.Context, req mcp.CallToolRequest) (*mcp.Cal
 func handleLuoshuConfigValidate(_ context.Context, _ mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	cfg, err := luoshu.Load()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to load config: %v", err)), nil
+		return mcp.NewToolResultError(errConfigLoad(err)), nil
 	}
 
 	issues := validateConfig(cfg)

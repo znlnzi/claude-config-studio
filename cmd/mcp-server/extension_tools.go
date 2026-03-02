@@ -226,7 +226,7 @@ func handleReadExtension(ctx context.Context, req mcp.CallToolRequest) (*mcp.Cal
 	}
 
 	if content == "" {
-		return mcp.NewToolResultError(fmt.Sprintf("extension not found: %s/%s", extType, name)), nil
+		return mcp.NewToolResultError(errExtensionNotFound(extType, name, scope)), nil
 	}
 
 	result := map[string]interface{}{
@@ -266,7 +266,7 @@ func handleSaveExtension(ctx context.Context, req mcp.CallToolRequest) (*mcp.Cal
 	}
 
 	if err := os.MkdirAll(extDir, 0755); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to create directory: %v", err)), nil
+		return mcp.NewToolResultError(errCreateDir(extDir, err)), nil
 	}
 
 	var filePath string
@@ -274,7 +274,7 @@ func handleSaveExtension(ctx context.Context, req mcp.CallToolRequest) (*mcp.Cal
 		// Skills use directory-based format
 		skillDir := filepath.Join(extDir, name)
 		if err := os.MkdirAll(skillDir, 0755); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to create skill dir: %v", err)), nil
+			return mcp.NewToolResultError(errCreateDir(skillDir, err)), nil
 		}
 		filePath = filepath.Join(skillDir, "SKILL.md")
 	} else {
@@ -282,7 +282,7 @@ func handleSaveExtension(ctx context.Context, req mcp.CallToolRequest) (*mcp.Cal
 	}
 
 	if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to write: %v", err)), nil
+		return mcp.NewToolResultError(errWriteFailed(filePath, err)), nil
 	}
 
 	result := map[string]interface{}{
@@ -324,7 +324,7 @@ func handleDeleteExtension(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 		skillDir := filepath.Join(extDir, name)
 		if _, err := os.Stat(skillDir); err == nil {
 			if err := os.RemoveAll(skillDir); err != nil {
-				return mcp.NewToolResultError(fmt.Sprintf("failed to delete skill dir: %v", err)), nil
+				return mcp.NewToolResultError(errDeleteFailed(skillDir, err)), nil
 			}
 			removed = true
 		}
@@ -335,14 +335,14 @@ func handleDeleteExtension(ctx context.Context, req mcp.CallToolRequest) (*mcp.C
 		flatPath := filepath.Join(extDir, name+".md")
 		if _, err := os.Stat(flatPath); err == nil {
 			if err := os.Remove(flatPath); err != nil {
-				return mcp.NewToolResultError(fmt.Sprintf("failed to delete: %v", err)), nil
+				return mcp.NewToolResultError(errDeleteFailed(flatPath, err)), nil
 			}
 			removed = true
 		}
 	}
 
 	if !removed {
-		return mcp.NewToolResultError(fmt.Sprintf("extension not found: %s/%s", extType, name)), nil
+		return mcp.NewToolResultError(errExtensionNotFound(extType, name, scope)), nil
 	}
 
 	result := map[string]interface{}{

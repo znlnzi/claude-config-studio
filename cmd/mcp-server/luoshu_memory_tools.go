@@ -50,7 +50,7 @@ func handleMemoryExtract(ctx context.Context, req mcp.CallToolRequest) (*mcp.Cal
 
 	cfg, err := luoshu.Load()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to load config: %v", err)), nil
+		return mcp.NewToolResultError(errConfigLoad(err)), nil
 	}
 
 	llm, _ := luoshu.NewProviders(cfg)
@@ -60,13 +60,13 @@ func handleMemoryExtract(ctx context.Context, req mcp.CallToolRequest) (*mcp.Cal
 
 	store, err := luoshu.NewMemoryStore()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize store: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("memory store", err)), nil
 	}
 
 	extractor := luoshu.NewExtractor(llm, store)
 	entries, err := extractor.Extract(ctx, summary, projectPath, tags)
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Extraction failed: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("extraction failed: %v. Check LLM API connection with luoshu_config_validate", err)), nil
 	}
 
 	result := map[string]interface{}{
@@ -110,22 +110,22 @@ func handleMemorySemanticSearch(ctx context.Context, req mcp.CallToolRequest) (*
 
 	cfg, err := luoshu.Load()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to load config: %v", err)), nil
+		return mcp.NewToolResultError(errConfigLoad(err)), nil
 	}
 
 	_, embedder := luoshu.NewProviders(cfg)
 
 	store, err := luoshu.NewMemoryStore()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize store: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("memory store", err)), nil
 	}
 	index, err := luoshu.NewVectorIndex()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize index: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("vector index", err)), nil
 	}
 	cache, err := luoshu.NewEmbeddingCache()
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Failed to initialize cache: %v", err)), nil
+		return mcp.NewToolResultError(errInitFailed("embedding cache", err)), nil
 	}
 
 	searcher := luoshu.NewSearcher(store, index, cache, embedder, cfg.Embedding.Model)
@@ -135,7 +135,7 @@ func handleMemorySemanticSearch(ctx context.Context, req mcp.CallToolRequest) (*
 		Mode:        mode,
 	})
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("Search failed: %v", err)), nil
+		return mcp.NewToolResultError(errSearchFailed(err)), nil
 	}
 
 	output := map[string]interface{}{

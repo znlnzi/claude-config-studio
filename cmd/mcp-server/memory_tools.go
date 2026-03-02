@@ -84,16 +84,16 @@ func handleSaveMemory(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallTo
 	mode := req.GetString("mode", "overwrite")
 
 	if !isSafeFilename(filename) {
-		return mcp.NewToolResultError("unsafe filename: must not contain '..' or path separators"), nil
+		return mcp.NewToolResultError(errInvalidFilename(filename)), nil
 	}
 
 	memoryDir, err := resolveMemoryDir(projectPath)
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to resolve path: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("failed to resolve memory path for %q: %v. Verify the project path is correct", projectPath, err)), nil
 	}
 
 	if err := os.MkdirAll(memoryDir, 0755); err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to create directory: %v", err)), nil
+		return mcp.NewToolResultError(errCreateDir(memoryDir, err)), nil
 	}
 
 	filePath := filepath.Join(memoryDir, filename)
@@ -101,15 +101,15 @@ func handleSaveMemory(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallTo
 	if mode == "append" {
 		f, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to open file: %v", err)), nil
+			return mcp.NewToolResultError(errWriteFailed(filePath, err)), nil
 		}
 		defer f.Close()
 		if _, err := f.WriteString(content); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to write: %v", err)), nil
+			return mcp.NewToolResultError(errWriteFailed(filePath, err)), nil
 		}
 	} else {
 		if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to write: %v", err)), nil
+			return mcp.NewToolResultError(errWriteFailed(filePath, err)), nil
 		}
 	}
 
@@ -131,18 +131,18 @@ func handleLoadMemory(ctx context.Context, req mcp.CallToolRequest) (*mcp.CallTo
 
 	memoryDir, err := resolveMemoryDir(projectPath)
 	if err != nil {
-		return mcp.NewToolResultError(fmt.Sprintf("failed to resolve path: %v", err)), nil
+		return mcp.NewToolResultError(fmt.Sprintf("failed to resolve memory path for %q: %v. Verify the project path is correct", projectPath, err)), nil
 	}
 
 	// Filename specified: return single file content
 	if filename != "" {
 		if !isSafeFilename(filename) {
-			return mcp.NewToolResultError("unsafe filename"), nil
+			return mcp.NewToolResultError(errInvalidFilename(filename)), nil
 		}
 		filePath := filepath.Join(memoryDir, filename)
 		data, err := os.ReadFile(filePath)
 		if err != nil {
-			return mcp.NewToolResultError(fmt.Sprintf("failed to read %s: %v", filename, err)), nil
+			return mcp.NewToolResultError(errReadFailed(filename, err)), nil
 		}
 		fi, _ := os.Stat(filePath)
 		modTime := ""
