@@ -10,6 +10,39 @@
 
 claude-config-mcp manages your Claude Code `.claude/` configuration through MCP tools, and adds **luoshu (洛书)** — a cross-session intelligent memory system that lets Claude remember your decisions, preferences, and project context across conversations.
 
+## Architecture
+
+```mermaid
+graph TB
+    CC[Claude Code CLI] -->|MCP Protocol| MCP[claude-config-mcp Server]
+
+    MCP --> CM[Configuration Management]
+    MCP --> LU[Luoshu Memory Engine]
+    MCP --> OV[File Semantic Search]
+
+    CM --> Memory[Memory Tools]
+    CM --> Config[Config Tools]
+    CM --> Templates[Template Engine]
+    CM --> Extensions[Extension Manager]
+    CM --> Hooks[Hooks Manager]
+    CM --> Evolution[Evolution Analyzer]
+
+    LU --> Store[Memory Store<br/>JSONL]
+    LU --> VecIdx[Vector Index<br/>Embeddings]
+    LU --> Recall[Intelligent Recall<br/>LLM Synthesis]
+    LU --> Provider[Multi-Provider<br/>OpenAI Compatible]
+
+    OV --> ClaudeIdx[Claude Index<br/>rules + memory files]
+
+    Provider --> OpenAI[OpenAI]
+    Provider --> DeepSeek[DeepSeek]
+    Provider --> More[Moonshot / Zhipu<br/>SiliconFlow / Volcengine]
+
+    style MCP fill:#f9f,stroke:#333,stroke-width:2px
+    style LU fill:#bbf,stroke:#333
+    style CM fill:#bfb,stroke:#333
+```
+
 ## Features
 
 ### Configuration Management

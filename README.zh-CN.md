@@ -10,6 +10,39 @@
 
 claude-config-mcp 通过 MCP 工具管理 Claude Code 的 `.claude/` 配置，并提供 **洛书 (luoshu)** — 一个跨会话智能记忆系统，让 Claude 在不同对话之间记住你的决策、偏好和项目上下文。
 
+## 架构
+
+```mermaid
+graph TB
+    CC[Claude Code CLI] -->|MCP 协议| MCP[claude-config-mcp 服务器]
+
+    MCP --> CM[配置管理]
+    MCP --> LU[洛书记忆引擎]
+    MCP --> OV[文件语义搜索]
+
+    CM --> Memory[记忆工具]
+    CM --> Config[配置工具]
+    CM --> Templates[模板引擎]
+    CM --> Extensions[扩展管理器]
+    CM --> Hooks[Hooks 管理器]
+    CM --> Evolution[演化分析器]
+
+    LU --> Store[记忆存储<br/>JSONL]
+    LU --> VecIdx[向量索引<br/>Embeddings]
+    LU --> Recall[智能回忆<br/>LLM 综合]
+    LU --> Provider[多 Provider<br/>OpenAI 兼容]
+
+    OV --> ClaudeIdx[Claude 索引<br/>rules + memory 文件]
+
+    Provider --> OpenAI[OpenAI]
+    Provider --> DeepSeek[DeepSeek]
+    Provider --> More[Moonshot / 智谱<br/>硅基流动 / 火山引擎]
+
+    style MCP fill:#f9f,stroke:#333,stroke-width:2px
+    style LU fill:#bbf,stroke:#333
+    style CM fill:#bfb,stroke:#333
+```
+
 ## 功能特性
 
 ### 配置管理
