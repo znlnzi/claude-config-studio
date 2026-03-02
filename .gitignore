@@ -52,3 +52,7 @@ Thumbs.db
 .claude/tasks/
 .claude/teams/
 .claude/.setup-meta.json
+
+# VitePress
+docs/.vitepress/dist
+docs/.vitepress/cache

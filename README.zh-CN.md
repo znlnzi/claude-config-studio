@@ -9,6 +9,8 @@
 
 **Claude Code 在会话之间会遗忘一切。这个 MCP Server 解决了这个问题。**
 
+📖 **[文档站](https://znlnzi.github.io/claude-config-studio/)** | 📦 **[npm](https://www.npmjs.com/package/claude-config-mcp)** | 🗺️ **[路线图](ROADMAP.md)**
+
 claude-config-mcp 通过 MCP 工具管理 Claude Code 的 `.claude/` 配置，并提供 **洛书 (luoshu)** — 一个跨会话智能记忆系统，让 Claude 在不同对话之间记住你的决策、偏好和项目上下文。
 
 ## 架构

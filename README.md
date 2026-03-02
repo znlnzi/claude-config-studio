@@ -9,6 +9,8 @@
 
 **Claude Code forgets everything between sessions. This MCP server fixes that.**
 
+📖 **[Documentation](https://znlnzi.github.io/claude-config-studio/)** | 📦 **[npm](https://www.npmjs.com/package/claude-config-mcp)** | 🗺️ **[Roadmap](ROADMAP.md)**
+
 claude-config-mcp manages your Claude Code `.claude/` configuration through MCP tools, and adds **luoshu (洛书)** — a cross-session intelligent memory system that lets Claude remember your decisions, preferences, and project context across conversations.
 
 ## Architecture
