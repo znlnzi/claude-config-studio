@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2026-03-02
+
+### Added
+- 153 handler unit tests for `cmd/mcp-server/` (7 test files covering memory, config, extension, hooks, template, resource, and provider handlers)
+- Mermaid architecture diagrams in both README.md and README.zh-CN.md
+- GoDoc package comments for `internal/luoshu`, `internal/exporter`, `internal/claude`, `internal/evolve`
+- Version injection via ldflags from `npm/package.json` (single source of truth)
+
+### Changed
+- Refactored `main.go`: tool builders and handlers moved to dedicated files (memory_tools.go, config_tools.go, etc.)
+- CI now runs `cmd/mcp-server/` tests alongside `internal/...` tests
+- `serverVersion` changed from hardcoded const to ldflags-injected variable
+
+### Fixed
+- Go version in CONTRIBUTING.md (now matches CI)
+- npm package.json: added `author` and `homepage` fields
+
 ## [0.7.2] - 2026-03-01
 
 ### Added
