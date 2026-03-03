@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-03-03
+
+### Added
+- Template marketplace: `marketplace_search`, `marketplace_install`, `marketplace_info` MCP tools for discovering and installing community-contributed templates from a remote GitHub registry
+- Community template registry (`registry/index.json`) with 5 starter templates: react-testing, typescript-strict, go-api-service, python-fastapi, docker-compose
+- `detect_project` MCP tool for smarter setup wizard — detects language, framework, test framework, package manager, git status, and Claude configuration in one call
+- `--version` flag for the MCP server binary
+- Actionable fix suggestions in error messages (all `err*` helper functions include remediation hints)
+
+### Changed
+- Refactored `handleInstallTemplate` to use shared `resolveClaudeDir` and `installTemplate` helpers, eliminating duplication between builtin and marketplace install paths
+- Updated `serverInstructions` with Marketplace tool category
+
 ## [0.8.0] - 2026-03-02
 
 ### Added

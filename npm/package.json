@@ -1,16 +1,16 @@
 {
   "name": "claude-config-mcp",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "MCP Server for managing Claude Code configuration with luoshu (洛书) cross-session intelligent memory — semantic search, auto-extraction, and LLM-powered recall.",
   "bin": {
     "claude-config-mcp": "bin/cli.js"
   },
   "optionalDependencies": {
-    "@claude-config/darwin-arm64": "0.8.0",
-    "@claude-config/darwin-x64": "0.8.0",
-    "@claude-config/linux-x64": "0.8.0",
-    "@claude-config/linux-arm64": "0.8.0",
-    "@claude-config/win32-x64": "0.8.0"
+    "@claude-config/darwin-arm64": "0.9.0",
+    "@claude-config/darwin-x64": "0.9.0",
+    "@claude-config/linux-x64": "0.9.0",
+    "@claude-config/linux-arm64": "0.9.0",
+    "@claude-config/win32-x64": "0.9.0"
   },
   "scripts": {
     "postinstall": "node scripts/postinstall.js"
